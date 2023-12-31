@@ -20,6 +20,8 @@
 #ifndef __SPLINE_H__
 #define __SPLINE_H__
 
+namespace reSID {
+
 // Our objective is to construct a smooth interpolating single-valued function
 // y = f(x).
 //
@@ -114,7 +116,7 @@
 //
 
 
-#if SPLINE_BRUTE_FORCE
+#if defined(SPLINE_BRUTE_FORCE)
 #define interpolate_segment interpolate_brute_force
 #else
 #define interpolate_segment interpolate_forward_difference
@@ -268,5 +270,6 @@ class PointPlotter
   }
 };
 
+} // namespace reSID
 
 #endif // not __SPLINE_H__

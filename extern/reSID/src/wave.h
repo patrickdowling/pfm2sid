@@ -22,6 +22,8 @@
 
 #include "siddefs.h"
 
+namespace reSID {
+
 // ----------------------------------------------------------------------------
 // A 24 bit accumulator is the basis for waveform generation. FREQ is added to
 // the lower 16 bits of the accumulator each cycle.
@@ -97,20 +99,20 @@ protected:
   RESID_INLINE reg12 outputNPST();
 
   // Sample data for combinations of waveforms.
-  static reg8 wave6581__ST[];
-  static reg8 wave6581_P_T[];
-  static reg8 wave6581_PS_[];
-  static reg8 wave6581_PST[];
+  static const reg8 wave6581__ST[];
+  static const reg8 wave6581_P_T[];
+  static const reg8 wave6581_PS_[];
+  static const reg8 wave6581_PST[];
 
-  static reg8 wave8580__ST[];
-  static reg8 wave8580_P_T[];
-  static reg8 wave8580_PS_[];
-  static reg8 wave8580_PST[];
+  static const reg8 wave8580__ST[];
+  static const reg8 wave8580_P_T[];
+  static const reg8 wave8580_PS_[];
+  static const reg8 wave8580_PST[];
 
-  reg8* wave__ST;
-  reg8* wave_P_T;
-  reg8* wave_PS_;
-  reg8* wave_PST;
+  const reg8* wave__ST;
+  const reg8* wave_P_T;
+  const reg8* wave_PS_;
+  const reg8* wave_PST;
 
 friend class Voice;
 friend class SID;
@@ -499,5 +501,7 @@ reg12 WaveformGenerator::output()
 }
 
 #endif // RESID_INLINING || defined(__WAVE_CC__)
+
+} // namespace reSID
 
 #endif // not __WAVE_H__

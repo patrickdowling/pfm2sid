@@ -20,14 +20,16 @@
 #include "sid.h"
 #include <math.h>
 
+namespace reSID {
+
 // ----------------------------------------------------------------------------
 // Constructor.
 // ----------------------------------------------------------------------------
 SID::SID()
 {
   // Initialize pointers.
-  sample = 0;
-  fir = 0;
+  sample = nullptr;
+  fir = nullptr;
 
   voice[0].set_sync_source(&voice[2]);
   voice[1].set_sync_source(&voice[0]);
@@ -88,11 +90,11 @@ void SID::reset()
 // Note that to mix in an external audio signal, the signal should be
 // resampled to 1MHz first to avoid sampling noise.
 // ----------------------------------------------------------------------------
-void SID::input(int sample)
+void SID::input(int input_sample)
 {
   // Voice outputs are 20 bits. Scale up to match three voices in order
   // to facilitate simulation of the MOS8580 "digi boost" hardware hack.
-  ext_in = (sample << 4)*3;
+  ext_in = (input_sample << 4)*3;
 }
 
 // ----------------------------------------------------------------------------
@@ -103,28 +105,28 @@ int SID::output()
 {
   const int range = 1 << 16;
   const int half = range >> 1;
-  int sample = extfilt.output()/((4095*255 >> 7)*3*15*2/range);
-  if (sample >= half) {
+  int output_sample = extfilt.output()/((4095*255 >> 7)*3*15*2/range);
+  if (output_sample >= half) {
     return half - 1;
   }
-  if (sample < -half) {
+  if (output_sample < -half) {
     return -half;
   }
-  return sample;
+  return output_sample;
 }
 
 int SID::output(int bits)
 {
   const int range = 1 << bits;
   const int half = range >> 1;
-  int sample = extfilt.output()/((4095*255 >> 7)*3*15*2/range);
-  if (sample >= half) {
+  int output_sample = extfilt.output()/((4095*255 >> 7)*3*15*2/range);
+  if (output_sample >= half) {
     return half - 1;
   }
-  if (sample < -half) {
+  if (output_sample < -half) {
     return -half;
   }
-  return sample;
+  return output_sample;
 }
 
 
@@ -479,8 +481,8 @@ bool SID::set_sampling_parameters(double clock_freq, sampling_method method,
   {
     delete[] sample;
     delete[] fir;
-    sample = 0;
-    fir = 0;
+    sample = nullptr;
+    fir = nullptr;
     return true;
   }
 
@@ -1005,3 +1007,5 @@ int SID::clock_resample_fast(cycle_count& delta_t, short* buf, int n,
   delta_t = 0;
   return s;
 }
+
+} // namespace reSID

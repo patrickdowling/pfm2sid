@@ -20,6 +20,8 @@
 #ifndef __SIDDEFS_H__
 #define __SIDDEFS_H__
 
+namespace reSID {
+
 // Define bool, true, and false for C++ compilers that lack these keywords.
 #define RESID_HAVE_BOOL 1
 
@@ -63,5 +65,7 @@ const char* resid_version_string = VERSION;
 // Inlining on/off.
 #define RESID_INLINING 1
 #define RESID_INLINE inline
+
+} // namespace reSID
 
 #endif // not __SIDDEFS_H__

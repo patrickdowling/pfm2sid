@@ -22,10 +22,14 @@
 
 #include "siddefs.h"
 
+namespace reSID {
+
 class Potentiometer
 {
 public:
   reg8 readPOT();
 };
+
+} // namespace reSID
 
 #endif

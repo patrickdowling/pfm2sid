@@ -20,6 +20,7 @@
 #define __EXTFILT_CC__
 #include "extfilt.h"
 
+namespace reSID {
 
 // ----------------------------------------------------------------------------
 // Constructor.
@@ -77,3 +78,5 @@ void ExternalFilter::reset()
   Vhp = 0;
   Vo = 0;
 }
+
+} // namespace reSID

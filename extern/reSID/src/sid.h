@@ -26,6 +26,8 @@
 #include "extfilt.h"
 #include "pot.h"
 
+namespace reSID {
+
 class SID
 {
 public:
@@ -142,5 +144,7 @@ protected:
   // FIR_RES filter tables (FIR_N*FIR_RES).
   short* fir;
 };
+
+} // namespace reSID
 
 #endif // not __SID_H__

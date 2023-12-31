@@ -22,6 +22,8 @@
 
 #include "siddefs.h"
 
+namespace reSID {
+
 // ----------------------------------------------------------------------------
 // A 15 bit counter is used to implement the envelope rates, in effect
 // dividing the clock to the envelope counter by the currently selected rate
@@ -69,10 +71,10 @@ protected:
 
   // Lookup table to convert from attack, decay, or release value to rate
   // counter period.
-  static reg16 rate_counter_period[];
+  static const reg16 rate_counter_period[];
 
   // The 16 selectable sustain levels.
-  static reg8 sustain_level[];
+  static const reg8 sustain_level[];
 
 friend class SID;
 };
@@ -301,5 +303,7 @@ reg8 EnvelopeGenerator::output()
 }
 
 #endif // RESID_INLINING || defined(__ENVELOPE_CC__)
+
+} // namespace reSID
 
 #endif // not __ENVELOPE_H__

@@ -23,6 +23,8 @@
 #include "siddefs.h"
 #include "spline.h"
 
+namespace reSID {
+
 // ----------------------------------------------------------------------------
 // The SID filter is modeled with a two-integrator-loop biquadratic filter,
 // which has been confirmed by Bob Yannes to be the actual circuit used in
@@ -191,9 +193,9 @@ protected:
   sound_sample f0_6581[2048];
   sound_sample f0_8580[2048];
   sound_sample* f0;
-  static fc_point f0_points_6581[];
-  static fc_point f0_points_8580[];
-  fc_point* f0_points;
+  static const fc_point f0_points_6581[];
+  static const fc_point f0_points_8580[];
+  const fc_point* f0_points;
   int f0_count;
 
 friend class SID;
@@ -527,5 +529,7 @@ sound_sample Filter::output()
 }
 
 #endif // RESID_INLINING || defined(__FILTER_CC__)
+
+} // namespace reSID
 
 #endif // not __FILTER_H__

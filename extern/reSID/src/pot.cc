@@ -19,8 +19,12 @@
 
 #include "pot.h"
 
+namespace reSID {
+
 reg8 Potentiometer::readPOT()
 {
   // NB! Not modeled.
   return 0xff;
 }
+
+} // namespace reSID

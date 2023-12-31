@@ -20,6 +20,8 @@
 #define __FILTER_CC__
 #include "filter.h"
 
+namespace reSID {
+
 // Maximum cutoff frequency is specified as
 // FCmax = 2.6e-5/C = 2.6e-5/2200e-12 = 11818.
 //
@@ -42,7 +44,7 @@
 // NB! Cutoff frequency characteristics may vary, we have modeled two
 // particular Commodore 64s.
 
-fc_point Filter::f0_points_6581[] =
+const fc_point Filter::f0_points_6581[] =
 {
   //  FC      f         FCHI FCLO
   // ----------------------------
@@ -79,7 +81,7 @@ fc_point Filter::f0_points_6581[] =
   { 2047, 18000 }    // 0xff 0x07 - repeated end point
 };
 
-fc_point Filter::f0_points_8580[] =
+const fc_point Filter::f0_points_8580[] =
 {
   //  FC      f         FCHI FCLO
   // ----------------------------
@@ -220,13 +222,13 @@ void Filter::reset()
 // ----------------------------------------------------------------------------
 void Filter::writeFC_LO(reg8 fc_lo)
 {
-  fc = fc & 0x7f8 | fc_lo & 0x007;
+  fc = (fc & 0x7f8) | (fc_lo & 0x007);
   set_w0();
 }
 
 void Filter::writeFC_HI(reg8 fc_hi)
 {
-  fc = (fc_hi << 3) & 0x7f8 | fc & 0x007;
+  fc = ((fc_hi << 3) & 0x7f8) | (fc & 0x007);
   set_w0();
 }
 
@@ -303,3 +305,5 @@ PointPlotter<sound_sample> Filter::fc_plotter()
 {
   return PointPlotter<sound_sample>(f0);
 }
+
+} // namespace reSID
