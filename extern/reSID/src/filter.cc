@@ -44,7 +44,7 @@ namespace reSID {
 // NB! Cutoff frequency characteristics may vary, we have modeled two
 // particular Commodore 64s.
 
-const fc_point Filter::f0_points_6581[] =
+static constexpr fc_point f0_points_6581[] =
 {
   //  FC      f         FCHI FCLO
   // ----------------------------
@@ -81,7 +81,7 @@ const fc_point Filter::f0_points_6581[] =
   { 2047, 18000 }    // 0xff 0x07 - repeated end point
 };
 
-const fc_point Filter::f0_points_8580[] =
+static constexpr fc_point f0_points_8580[] =
 {
   //  FC      f         FCHI FCLO
   // ----------------------------
@@ -106,6 +106,22 @@ const fc_point Filter::f0_points_8580[] =
   { 2047, 12500 }    // 0xff 0x07 - repeated end point
 };
 
+#ifdef RESID_FILTER_CONSTEXPR
+constexpr auto generate_f0_table(const fc_point* src, unsigned N)
+{
+  struct {
+    sound_sample data[2048] = {};
+    operator const sound_sample *() const { return data; }
+  } table;
+  interpolate(src, src + N - 1, PointPlotter<sound_sample>(table.data), 1.0);
+  return table;
+}
+
+static constexpr auto f0_6581 =
+    generate_f0_table(f0_points_6581, sizeof(f0_points_6581) / sizeof(*f0_points_6581));
+static constexpr auto f0_8580 =
+    generate_f0_table(f0_points_8580, sizeof(f0_points_8580) / sizeof(*f0_points_8580));
+#endif
 
 // ----------------------------------------------------------------------------
 // Constructor.
@@ -132,6 +148,7 @@ Filter::Filter()
 
   enable_filter(true);
 
+#ifndef RESID_FILTER_CONSTEXPR
   // Create mappings from FC to cutoff frequency.
   interpolate(f0_points_6581, f0_points_6581
 	      + sizeof(f0_points_6581)/sizeof(*f0_points_6581) - 1,
@@ -139,7 +156,7 @@ Filter::Filter()
   interpolate(f0_points_8580, f0_points_8580
 	      + sizeof(f0_points_8580)/sizeof(*f0_points_8580) - 1,
 	      PointPlotter<sound_sample>(f0_8580), 1.0);
-
+#endif
   set_chip_model(MOS6581);
 }
 
@@ -282,7 +299,7 @@ void Filter::set_Q()
 // ----------------------------------------------------------------------------
 // Spline functions.
 // ----------------------------------------------------------------------------
-
+#ifndef RESID_FILTER_CONSTEXPR
 // ----------------------------------------------------------------------------
 // Return the array of spline interpolation points used to map the FC register
 // to filter cutoff frequency.
@@ -305,5 +322,5 @@ PointPlotter<sound_sample> Filter::fc_plotter()
 {
   return PointPlotter<sound_sample>(f0);
 }
-
-} // namespace reSID
+#endif
+}  // namespace reSID

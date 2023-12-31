@@ -150,6 +150,9 @@ public:
   void fc_default(const fc_point*& points, int& count);
   PointPlotter<sound_sample> fc_plotter();
 
+  // Accessor for tests
+  const sound_sample *get_f0() const { return f0; }
+
 protected:
   void set_w0();
   void set_Q();
@@ -190,11 +193,15 @@ protected:
 
   // Cutoff frequency tables.
   // FC is an 11 bit register.
+#ifndef RESID_FILTER_CONSTEXPR
   sound_sample f0_6581[2048];
   sound_sample f0_8580[2048];
   sound_sample* f0;
-  static const fc_point f0_points_6581[];
-  static const fc_point f0_points_8580[];
+  //static const fc_point f0_points_6581[]; -> defined in .cc file
+  //static const fc_point f0_points_8580[];
+#else
+  const sound_sample* f0;
+#endif
   const fc_point* f0_points;
   int f0_count;
 

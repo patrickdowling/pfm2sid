@@ -127,7 +127,7 @@ namespace reSID {
 // Calculation of coefficients.
 // ----------------------------------------------------------------------------
 inline
-void cubic_coefficients(double x1, double y1, double x2, double y2,
+constexpr void cubic_coefficients(double x1, double y1, double x2, double y2,
 			double k1, double k2,
 			double& a, double& b, double& c, double& d)
 {
@@ -163,11 +163,11 @@ void interpolate_brute_force(double x1, double y1, double x2, double y2,
 // ----------------------------------------------------------------------------
 template<class PointPlotter>
 inline
-void interpolate_forward_difference(double x1, double y1, double x2, double y2,
+constexpr void interpolate_forward_difference(double x1, double y1, double x2, double y2,
 				    double k1, double k2,
 				    PointPlotter plot, double res)
 {
-  double a, b, c, d;
+  double a = 0., b = 0., c = 0., d = 0.;
   cubic_coefficients(x1, y1, x2, y2, k1, k2, a, b, c, d);
   
   double y = ((a*x1 + b)*x1 + c)*x1 + d;
@@ -184,14 +184,14 @@ void interpolate_forward_difference(double x1, double y1, double x2, double y2,
 
 template<class PointIter>
 inline
-double x(PointIter p)
+constexpr double x(PointIter p)
 {
   return (*p)[0];
 }
 
 template<class PointIter>
 inline
-double y(PointIter p)
+constexpr double y(PointIter p)
 {
   return (*p)[1];
 }
@@ -206,9 +206,9 @@ double y(PointIter p)
 // ----------------------------------------------------------------------------
 template<class PointIter, class PointPlotter>
 inline
-void interpolate(PointIter p0, PointIter pn, PointPlotter plot, double res)
+constexpr void interpolate(PointIter p0, PointIter pn, PointPlotter plot, double res)
 {
-  double k1, k2;
+  double k1 = 0., k2 = 0.;
 
   // Set up points for first curve segment.
   PointIter p1 = p0; ++p1;
@@ -255,11 +255,11 @@ class PointPlotter
   F* f;
 
  public:
-  PointPlotter(F* arr) : f(arr)
+  constexpr PointPlotter(F* arr) : f(arr)
   {
   }
 
-  void operator ()(double x, double y)
+  constexpr void operator ()(double x, double y)
   {
     // Clamp negative values to zero.
     if (y < 0) {
