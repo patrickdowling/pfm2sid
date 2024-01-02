@@ -1,0 +1,21 @@
+name: Run unit tests
+on: [push]
+jobs:
+  tests:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: 'true'
+      - uses: actions/setup-python@v3
+        with:
+          python-version: '3.x'
+          cache: 'pip'
+      - run: pip install -r .github/workflows/requirements.txt
+      - run: |
+          make wrap
+          make setup
+          make
+        working-directory: ./test
+      - run: ./build/pfm2sid_test
+        working-directory: ./test
