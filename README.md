@@ -2,7 +2,7 @@
 
 ![PreenFM2+SID](./docs/pfm2sid.jpg)
 
-What is it? A (emulated) SID synth playable via MIDI running the PreenFM2 hardware platform.
+What is it? A (emulated) SID synth playable via MIDI running on the PreenFM2 hardware platform.
 
 Coming from BBC, Amstrad CPC and Atari ST I never really got into the details of the SID chip...
 
