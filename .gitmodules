@@ -1,0 +1,3 @@
+[submodule "stm32x"]
+	path = stm32x
+	url = https://github.com/patrickdowling/stm32x.git
