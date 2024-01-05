@@ -1,7 +1,7 @@
 #include "fmt/core.h"
 #include "gtest/gtest.h"
 
-#undef RESID_FILTER_CONSTEXPR // just in case
+#undef RESID_FILTER_CONSTEXPR  // just in case
 #include "reSID/src/filter.h"
 #include "reSID/src/spline.h"
 
@@ -57,7 +57,7 @@ constexpr auto generate_f0_table(const fc_point* src, unsigned N)
   // The magic of auto...
   struct {
     sound_sample data[2048] = {};
-    operator const sound_sample *() const { return data; }
+    operator const sound_sample*() const { return data; }
   } table;
   reSID::interpolate(src, src + N - 1, PointPlotter<sound_sample>(table.data), 1.0);
   return table;

@@ -61,7 +61,10 @@ TRAP_HANDLER(__cxa_pure_virtual);
 
 }  // extern "C"
 
-void *operator new(unsigned int) noexcept { return nullptr; }
+void *operator new(unsigned int) noexcept
+{
+  return nullptr;
+}
 
 void operator delete(void *) noexcept
 {
@@ -72,7 +75,15 @@ void operator delete(void *, unsigned int) noexcept
   while (1) {}
 }
 
-void *operator new[](unsigned int) noexcept { return nullptr; }
-void operator delete[](void *) noexcept { while (1) {} }
-void operator delete[](void *, unsigned int) noexcept { while (1) {} }
-
+void *operator new[](unsigned int) noexcept
+{
+  return nullptr;
+}
+void operator delete[](void *) noexcept
+{
+  while (1) {}
+}
+void operator delete[](void *, unsigned int) noexcept
+{
+  while (1) {}
+}

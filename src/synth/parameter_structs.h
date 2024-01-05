@@ -243,7 +243,8 @@ public:
   }
 
   template <SYSTEM parameter, typename T>
-  auto get() const  {
+  auto get() const
+  {
     return detail::typed_value<T>(get<parameter>().value());
   }
 

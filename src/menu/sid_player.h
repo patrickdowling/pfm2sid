@@ -87,7 +87,8 @@ public:
       static_assert(sizeof(progress) == 2 * 12 + 1);
 
       auto pct = sid_stream_.percent();
-      display.Fmt(2, "[%.*s]%5.1f%%", 12, progress + 12 - (int)(pct / 100.f * 12.f), PRINT_F32(pct));
+      display.Fmt(2, "[%.*s]%5.1f%%", 12, progress + 12 - (int)(pct / 100.f * 12.f),
+                  PRINT_F32(pct));
       display.Fmt(3, "%20" PRIu32, stats::render_block_cycles.value_in_us());
     }
   }
