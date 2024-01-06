@@ -175,6 +175,7 @@ static void Init()
   engine.Init(&current_patch.parameters);
   sid_synth_.Init(&current_patch.parameters);
 
+  sid_synth_editor_.MenuInit();
   sid_synth_editor_.register_listener(&engine);
   sid_synth_editor_.register_listener(&sid_synth_);
 

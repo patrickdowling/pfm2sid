@@ -35,6 +35,8 @@ public:
 
   const char *name() const { return name_; }
 
+  virtual void MenuInit() {}
+
   virtual void HandleMenuEvent(MENU_EVENT) = 0;
   virtual void HandleEvent(const Event &) = 0;
   virtual void UpdateDisplay() const = 0;

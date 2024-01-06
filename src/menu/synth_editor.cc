@@ -28,6 +28,8 @@
 #include "pfm2sid.h"
 #include "pfm2sid_stats.h"
 #include "synth/engine.h"
+#include "synth/modulation.h"
+#include "synth/parameter_types.h"
 #include "synth/patch.h"
 #include "synth/sid_synth.h"
 #include "ui/display.h"
@@ -87,6 +89,12 @@ static constexpr EDITOR_PAGE menu_levels[][5] = {
      EDITOR_PAGE::NONE},
 };
 
+void SIDSynthEditor::MenuInit()
+{
+  register_listener(this);
+  voice_mode_ = current_patch.parameters.get<GLOBAL::VOICE_MODE, VOICE_MODE>();
+}
+
 void SIDSynthEditor::HandleMenuEvent(MENU_EVENT menu_event)
 {
   if (MENU_EVENT::ENTER == menu_event) {
@@ -144,10 +152,12 @@ void SIDSynthEditor::UpdateDisplay() const
   }
 
   if (editor_page_ == EDITOR_PAGE::INFO) {
-    display.Fmt(2, "%4.1fx%" PRIu32 " dt=%u",
+    display.Fmt(0, "reSID %s", reSID::resid_version_string);
+    display.Fmt(1, "Clk: %luMHz", SystemCoreClock / 1000UL / 1000UL);
+    display.Fmt(2, "Eng: %4.1fx%" PRIu32 " dt=%u",
                 PRINT_F32(static_cast<float>(kDacUpdateRateHz) / 1000.f), kSampleBlockSize,
                 Engine::clock_delta_t);
-    display.Fmt(3, "%4.1fKhz", PRINT_F32(kModulatorUpdateRateHz));
+    display.Fmt(3, "Mod: %4.1f", PRINT_F32(kModulatorUpdateRateHz));
     return;
   }
 
@@ -173,7 +183,10 @@ void SIDSynthEditor::UpdateDisplay() const
       case PARAMETER_SCOPE::SYSTEM:
       case PARAMETER_SCOPE::GLOBAL: snprintf(buf, sizeof(buf), "%s", page_def.title); break;
       case PARAMETER_SCOPE::VOICE:
-        snprintf(buf, sizeof(buf), "VOI%d/%d %s", voice_index_ + 1, 3, page_def.title);
+        if (edit_individual_voices())
+          snprintf(buf, sizeof(buf), "Voice%d %s", voice_index_ + 1, page_def.title);
+        else
+          snprintf(buf, sizeof(buf), "%s", page_def.title);
         break;
       case PARAMETER_SCOPE::LFO:
         snprintf(buf, sizeof(buf), "LFO%d/%d %s", lfo_index_ + 1, 3, page_def.title);
@@ -197,13 +210,26 @@ void SIDSynthEditor::UpdateDisplay() const
   }
 }
 
+void SIDSynthEditor::GlobalParameterChanged(GLOBAL parameter)
+{
+  switch (parameter) {
+    case GLOBAL::VOICE_MODE:
+      voice_mode_ = current_patch.parameters.get<GLOBAL::VOICE_MODE, VOICE_MODE>();
+      switch (voice_mode_) {
+        case VOICE_MODE::UNISON: voice_index_ = sidbits::VOICE1; break;
+        case VOICE_MODE::POLY: break;
+      }
+      break;
+    default: break;
+  }
+}
 void SIDSynthEditor::CycleVoiceOrLfo()
 {
   auto page_def = editor_page_defs[static_cast<unsigned>(editor_page_)];
 
   if (page_def.parameter_type == PARAMETER_SCOPE::VOICE) {
     unsigned voice_index = voice_index_;
-    if (voice_index < sidbits::VOICE3)
+    if (edit_individual_voices() && voice_index < sidbits::VOICE3)
       ++voice_index;
     else
       voice_index = sidbits::VOICE1;

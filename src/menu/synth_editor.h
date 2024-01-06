@@ -58,17 +58,20 @@ struct EditorPageDef {
   ParameterRef parameters[4] = {};
 };
 
-class SIDSynthEditor : public Menu {
+class SIDSynthEditor : public Menu, public ParameterListener {
 public:
   SIDSynthEditor() : Menu("SID SYNTH") {}
   DELETE_COPY_MOVE(SIDSynthEditor);
 
+  void MenuInit() final;
   void HandleMenuEvent(MENU_EVENT menu_event) final;
   void HandleEvent(const Event &event) final;
   void UpdateDisplay() const final;
   void Step() final {}
 
   void register_listener(ParameterListener *listener) { listeners_.push_back(listener); }
+
+  void GlobalParameterChanged(GLOBAL parameter);
 
 private:
   int menu_level_ = -1;
@@ -79,12 +82,16 @@ private:
   mutable char name_buf_[21] = {};
   mutable char value_buf_[21] = {};
 
+  VOICE_MODE voice_mode_ = VOICE_MODE::POLY;
+
   sidbits::VOICE_INDEX voice_index_ = sidbits::VOICE1;
   LFO_INDEX lfo_index_ = LFO1;
 
   char navigation_[3] = "";
 
   util::StaticStack<ParameterListener *, 8> listeners_;
+
+  bool edit_individual_voices() const { return VOICE_MODE::POLY != voice_mode_; }
 
   void CycleVoiceOrLfo();
   void SetMenuLevel(int level, bool force = false);
