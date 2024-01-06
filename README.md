@@ -40,7 +40,7 @@ In summary it's more of a technical exercise with a (or yet another?) uninspired
 
 ## SID Emulation
 
-- Based on the "ancient" reSID version 0.16. This still seems "Good Enough" and while the following versions are much improved the footprint is bigger. Some most of that should all be `constexpr`-able with some effort.
+- Based on the "ancient" reSID version 0.16. This still seems "Good Enough" and while the following versions are much improved the footprint is bigger. Part of that c/should be `constexpr`-able with some effort but 16MB tables are out for sure :)
 - Modifications to reSID were made to get it compiling and (eventually) strip out some unused functionality. Ideally they won't conflict _too_ much with the upstream and are isolated commits.
 - There are of course other SID implementations, e.g. I particularly like [chips](https://github.com/floooh/chips). Similarly, there are forks/mirrors of reSID, e.g. libsidplayfp.
 - In order to simplify things, the code writes a batch registers at once, then calls `clock` later to generate a block of samples.
