@@ -77,6 +77,7 @@ private:
 
   sidbits::RegisterMap register_map_;
 };
-};  // namespace pfm2sid::sidbits
+
+}  // namespace pfm2sid::sidbits
 
 #endif  // PFM2SID_SID_STREAM_H_

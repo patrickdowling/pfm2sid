@@ -37,6 +37,6 @@ public:
   virtual void GlobalParameterChanged(GLOBAL /*parameter*/) {}
 };
 
-};  // namespace pfm2sid::synth
+}  // namespace pfm2sid::synth
 
 #endif  // PFM2SID_SYNTH_PARAMETER_LISTENER_H_

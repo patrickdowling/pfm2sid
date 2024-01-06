@@ -30,7 +30,7 @@
 #include "synth.h"
 #include "util/util_lut.h"
 
-ENABLE_WCONVERSION();
+ENABLE_WCONVERSION()
 
 namespace pfm2sid::synth {
 

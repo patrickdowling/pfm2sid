@@ -38,7 +38,7 @@ using DEBUG_PIN_1 = GPIO::AIN1;
 using DEBUG_PIN_2 = GPIO::AIN2;
 using DEBUG_PIN_3 = GPIO::AIN3;
 using DEBUG_PIN_4 = GPIO::AIN4;
-};  // namespace DEBUG
+}  // namespace DEBUG
 
 }  // namespace pfm2sid
 

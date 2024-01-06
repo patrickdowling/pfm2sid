@@ -220,6 +220,6 @@ using s816 = FixedPoint<int32_t, 16, 8>;
 using u824 = FixedPoint<uint32_t, 24>;
 using u1616 = FixedPoint<uint32_t, 16>;
 
-};  // namespace util
+}  // namespace util
 
 #endif  // PFM2SID_FIXED_POINT_H_

@@ -47,7 +47,7 @@ extern const uint8_t _binary_test_dmp_start;
 extern const uint8_t _binary_test_dmp_end;
 }
 
-STM32X_CORE_DEFINE(INCCMZ);
+STM32X_CORE_DEFINE(INCCMZ)
 namespace pfm2sid {
 GPIO gpio;
 CoreTimer core_timer INCCM;

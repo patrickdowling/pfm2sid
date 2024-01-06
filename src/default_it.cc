@@ -46,18 +46,18 @@ void assert_failed(uint8_t *file, uint32_t line)
 }
 #endif
 
-EMPTY_HANDLER(NMI_Handler);
+EMPTY_HANDLER(NMI_Handler)
 
-TRAP_HANDLER(HardFault_Handler);
-TRAP_HANDLER(MemManage_Handler);
-TRAP_HANDLER(BusFault_Handler);
-TRAP_HANDLER(UsageFault_Handler);
+TRAP_HANDLER(HardFault_Handler)
+TRAP_HANDLER(MemManage_Handler)
+TRAP_HANDLER(BusFault_Handler)
+TRAP_HANDLER(UsageFault_Handler)
 
-EMPTY_HANDLER(SVC_Handler);
-EMPTY_HANDLER(DebugMon_Handler);
-EMPTY_HANDLER(PendSV_Handler);
+EMPTY_HANDLER(SVC_Handler)
+EMPTY_HANDLER(DebugMon_Handler)
+EMPTY_HANDLER(PendSV_Handler)
 
-TRAP_HANDLER(__cxa_pure_virtual);
+TRAP_HANDLER(__cxa_pure_virtual)
 
 }  // extern "C"
 

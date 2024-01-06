@@ -26,7 +26,7 @@
 #include "parameter_types.h"
 #include "stm32x/stm32x_debug.h"
 
-ENABLE_WCONVERSION();
+ENABLE_WCONVERSION()
 
 namespace pfm2sid::synth {
 

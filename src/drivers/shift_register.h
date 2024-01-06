@@ -45,6 +45,6 @@ public:
 
 extern ShiftRegister shift_register;
 
-};  // namespace pfm2sid
+}  // namespace pfm2sid
 
 #endif  // PFM2SID_SHIFT_REGISTER_H_

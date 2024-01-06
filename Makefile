@@ -9,6 +9,7 @@ PROJECT_SRC_DIRS = ./src ./src/drivers ./src/ui ./src/menu ./src/midi ./src/synt
 PROJECT_RESOURCE_DIR = ./resources
 PROJECT_RESOURCE_SCRIPT = $(PROJECT_RESOURCE_DIR)/resources.py
 STM32X_CPPSTD := c++17
+OPTIMIZE = -O3
 
 PROJECT_DEFINES += PFM2SID_DEBUG_ENABLE
 #PROJECT_DEFINES += USE_FULL_ASSERT
