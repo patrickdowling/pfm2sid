@@ -42,10 +42,16 @@ std::optional<size_t> ASIDParser::ParseSysex(const uint8_t *data, size_t len)
   if (!data || len < 2 || !is_asid_sysex(data)) return std::nullopt;
 
   switch (data[1]) {
-    case START_SID: strcpy(lcd_data_, "start"); break;
-    case STOP_SID: strcpy(lcd_data_, "stop"); break;
+    case START_SID:
+      strcpy(lcd_data_, "start");
+      return 0;
+      break;
+    case STOP_SID:
+      strcpy(lcd_data_, "stop");
+      return 0;
+      break;
     case COMMAND: return ParseCommandMessage(data + 2, len - 2); break;
-    case LCD_DATA: ParseLcdDataMessage(data + 2, len - 2); break;
+    case LCD_DATA: return ParseLcdDataMessage(data + 2, len - 2); break;
   }
 
   return std::nullopt;
@@ -90,14 +96,15 @@ std::optional<size_t> ASIDParser::ParseCommandMessage(const uint8_t *msg, size_t
   return register_count;
 }
 
-void ASIDParser::ParseLcdDataMessage(const uint8_t *msg, size_t len)
+size_t ASIDParser::ParseLcdDataMessage(const uint8_t *msg, size_t len)
 {
   memset(lcd_data_, 0, sizeof(lcd_data_));
   auto dst = lcd_data_;
   len = std::min(len, LCD_DATA_LEN);
 
-  while (len--) { *dst++ = *msg++; }
-  *dst = 0;
+  std::transform(msg, msg + len, dst, [](uint8_t b) { return static_cast<char>(b); });
+  dst[len] = 0;
+  return len;
 }
 
 }  // namespace pfm2sid::sidbits

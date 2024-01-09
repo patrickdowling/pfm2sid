@@ -68,7 +68,7 @@ private:
   sidbits::RegisterMap register_map_;
 
   std::optional<size_t> ParseCommandMessage(const uint8_t *msg, size_t len);
-  void ParseLcdDataMessage(const uint8_t *msg, size_t len);
+  size_t ParseLcdDataMessage(const uint8_t *msg, size_t len);
 };
 
 }  // namespace pfm2sid::sidbits
