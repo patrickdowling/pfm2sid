@@ -54,6 +54,10 @@ static constexpr unsigned kNumLfos = 3;
 
 enum struct VOICE_MODE { POLY, UNISON };
 
+static constexpr unsigned kMaxNameLength = 16;
+
+static constexpr unsigned kNumPatchesPerBank = 32;
+
 }  // namespace pfm2sid::synth
 
 ENABLE_ENUM_TO_INDEX(pfm2sid::synth::LFO_INDEX);

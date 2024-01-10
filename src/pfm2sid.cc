@@ -35,7 +35,7 @@
 #include "sidbits/asid_parser.h"
 #include "synth/engine.h"
 #include "synth/parameters.h"
-#include "synth/patch.h"
+#include "synth/patch_bank.h"
 #include "synth/sid_synth.h"
 #include "ui/display.h"
 #include "ui/ui.h"
@@ -65,6 +65,7 @@ static midi::MidiParser serial_midi_parser INCCM;
 static MODE current_mode = MODE::INVALID;
 synth::SystemParameters system_parameters INCCM;
 
+synth::PatchBank current_bank INCCM;
 synth::Patch current_patch INCCM;
 
 synth::Engine engine INCCM;
@@ -168,6 +169,8 @@ static void Init()
   dac.Init();
   midi_serial.Init();
   ui.Init();
+
+  current_patch = current_bank.Load(0);
 
   engine.Init(&current_patch.parameters);
   sid_synth_.Init(&current_patch.parameters);

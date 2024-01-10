@@ -55,6 +55,9 @@ static constexpr char ICON_MIDI_BEND = to_char<resources::LCD_CHAR_BEND>();
 static constexpr char ICON_MIDI_SYSEX = '!';
 static constexpr char ICON_VOICE_ACTIVE = to_char<resources::LCD_CHAR_NOTE>();
 
+static constexpr char ICON_PATCH_LOAD = LEFT_ARROW_CHAR;
+static constexpr char ICON_PATCH_SAVE = RIGHT_ARROW_CHAR;
+
 }  // namespace pfm2sid
 
 ENABLE_ENUM_TO_INDEX(pfm2sid::ICON_POS);

@@ -31,22 +31,31 @@ enum class MENU_EVENT { ENTER, EXIT };
 
 class Menu {
 public:
+  Menu() = delete;
   virtual ~Menu() = default;
 
   const char *name() const { return name_; }
 
   virtual void MenuInit() {}
-
-  virtual void HandleMenuEvent(MENU_EVENT) = 0;
   virtual void HandleEvent(const Event &) = 0;
   virtual void UpdateDisplay() const = 0;
-
   virtual void Step() = 0;
 
-protected:
-  Menu(const char *name) : name_(name) {}
+  void HandleMenuEvent(MENU_EVENT menu_event);
 
+  bool enable_status_bar() const { return enable_status_bar_; }
+
+  void set_back(Menu *menu) { back_ = menu; }
+
+protected:
+  Menu(const char *name, bool esb) : name_(name), enable_status_bar_(esb) {}
+
+  Menu *back_ = nullptr;
   const char *const name_ = nullptr;
+  bool enable_status_bar_ = true;
+
+  virtual void MenuEnter() {}
+  virtual void MenuExit() {}
 };
 
 }  // namespace pfm2sid

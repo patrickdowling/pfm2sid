@@ -1,6 +1,6 @@
 // pfm2sid: PreenFM2 meets SID
 //
-// Copyright (C) 2023-2024 Patrick Dowling (pld@gurkenkiste.com)
+// Copyright (C) 2024 Patrick Dowling (pld@gurkenkiste.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,35 +20,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-#ifndef PFM2SID_SYNTH_PATCH_H_
-#define PFM2SID_SYNTH_PATCH_H_
+#ifndef PFM2SID_MENU_PATCHES_H_
+#define PFM2SID_MENU_PATCHES_H_
 
-#include "synth/parameter_structs.h"
+#include "misc/cursor.h"
+#include "synth/synth.h"
+#include "ui/menu.h"
+#include "util/util_macros.h"
 
 namespace pfm2sid::synth {
 
-class PatchBank;
-class PatchBrowser;
-
-class Patch {
+class PatchBrowser : public Menu {
 public:
-  Patch() : name_{"Default"} {}
+  PatchBrowser() : Menu("PATCHES", false) {}
+  DELETE_COPY_MOVE(PatchBrowser);
 
-  int number() const { return number_; }
-  const char *name() const { return name_; }
+  void MenuInit() final;
+  void HandleEvent(const Event &event) final;
+  void UpdateDisplay() const final;
+  void Step() final;
 
-  Parameters parameters;
+protected:
+  void MenuEnter() final;
+  void Exit();
 
-private:
-  char name_[kMaxNameLength] = {0};
-  int number_ = 0;
+  void Load();
+  void Save();
 
-  friend class PatchBank;
-  friend class PatchBrowser;
-
-  void set_number(int n) { number_ = n; }
+  util::Cursor<4> cursor_{0, kNumPatchesPerBank};
+  bool saving_ = false;
 };
 
 }  // namespace pfm2sid::synth
 
-#endif  // PFM2SID_SYNTH_PATCH_H_
+#endif  // PFM2SID_MENU_PATCHES_H_

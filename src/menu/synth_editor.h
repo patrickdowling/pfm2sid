@@ -60,11 +60,10 @@ struct EditorPageDef {
 
 class SIDSynthEditor : public Menu, public ParameterListener {
 public:
-  SIDSynthEditor() : Menu("SID SYNTH") {}
+  SIDSynthEditor() : Menu("SID SYNTH", true) {}
   DELETE_COPY_MOVE(SIDSynthEditor);
 
   void MenuInit() final;
-  void HandleMenuEvent(MENU_EVENT menu_event) final;
   void HandleEvent(const Event &event) final;
   void UpdateDisplay() const final;
   void Step() final {}
@@ -72,6 +71,9 @@ public:
   void register_listener(ParameterListener *listener) { listeners_.push_back(listener); }
 
   void GlobalParameterChanged(GLOBAL parameter);
+
+protected:
+  void MenuEnter() final;
 
 private:
   int menu_level_ = -1;

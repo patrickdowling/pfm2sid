@@ -161,7 +161,7 @@ void Ui::SetMenu(Menu *menu)
   if (menu != current_menu_) {
     if (current_menu_) current_menu_->HandleMenuEvent(MENU_EVENT::EXIT);
     if (menu) {
-      display.Fmt(0, "%-16s", menu->name());
+      //display.Fmt(0, "%-16s", menu->name());
       menu->HandleMenuEvent(MENU_EVENT::ENTER);
     }
     current_menu_ = menu;

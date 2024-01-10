@@ -101,7 +101,7 @@ public:
       : desc_(ParameterDesc::Find(parameter_ref)), ivalue(desc_->default_value)
   {}
   ParameterValue() = delete;
-  DELETE_COPY_MOVE(ParameterValue);
+  //DELETE_COPY_MOVE(ParameterValue);
   // -> This might be overkill; we want to avoid copies from ::get() type functions, but it does
   // inhibit keeping parameters in a Patch (which might be copyable).
 
@@ -142,7 +142,7 @@ public:
   void Fmt(char* buf) const;
 
 private:
-  const ParameterDesc* const desc_;
+  const ParameterDesc* /*const*/ desc_;
   parameter_value_type ivalue;
 };
 

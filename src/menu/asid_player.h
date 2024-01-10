@@ -40,18 +40,12 @@ extern synth::Engine engine;
 
 class ASIDPlayer : public Menu {
 public:
-  ASIDPlayer() : Menu("\001 ASID \001") {}
+  ASIDPlayer() : Menu("\001 ASID \001", true) {}
   DELETE_COPY_MOVE(ASIDPlayer);
 
   void Step() {}
 
-  void HandleMenuEvent(MENU_EVENT menu_event) final
-  {
-    switch (menu_event) {
-      case MENU_EVENT::ENTER: engine.Reset(); break;
-      case MENU_EVENT::EXIT: break;
-    }
-  }
+  void MenuEnter() final { engine.Reset(); }
 
   void HandleEvent(const Event &event) final
   {

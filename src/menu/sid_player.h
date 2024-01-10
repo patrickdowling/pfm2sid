@@ -40,20 +40,14 @@ extern synth::Engine engine;
 // We could upload things via SYSEX but it'll make more sense once there's a file system.
 class SIDPlayer : public Menu {
 public:
-  SIDPlayer() : Menu("\001 SID PLAYER \001") {}
+  SIDPlayer() : Menu("\001 SID PLAYER \001", false) {}
   DELETE_COPY_MOVE(SIDPlayer);
 
   void Init(const sidbits::SIDStreamData &stream_data) { sid_stream_.Init(stream_data); }
 
   void Step() { sid_stream_.Step(); }
 
-  void HandleMenuEvent(MENU_EVENT menu_event) final
-  {
-    switch (menu_event) {
-      case MENU_EVENT::ENTER: engine.Reset(); break;
-      case MENU_EVENT::EXIT: break;
-    }
-  }
+  void MenuEnter() final { engine.Reset(); }
 
   void HandleEvent(const Event &event) final
   {

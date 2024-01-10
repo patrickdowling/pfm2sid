@@ -1,6 +1,6 @@
 // pfm2sid: PreenFM2 meets SID
 //
-// Copyright (C) 2023-2024 Patrick Dowling (pld@gurkenkiste.com)
+// Copyright (C) 2024 Patrick Dowling (pld@gurkenkiste.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,35 +20,31 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-#ifndef PFM2SID_SYNTH_PATCH_H_
-#define PFM2SID_SYNTH_PATCH_H_
-
-#include "synth/parameter_structs.h"
+#include "synth/patch.h"
 
 namespace pfm2sid::synth {
 
-class PatchBank;
-class PatchBrowser;
-
-class Patch {
+class PatchBank {
 public:
-  Patch() : name_{"Default"} {}
+  PatchBank() : name_{"Default"} {}
 
-  int number() const { return number_; }
   const char *name() const { return name_; }
 
-  Parameters parameters;
+  auto &operator[](size_t i) const { return patches_[i]; }
 
-private:
+  auto &Load(size_t i) const { return patches_[i]; }
+  auto &Save(size_t i, const Patch &patch)
+  {
+    patches_[i] = patch;
+    return patches_[i];
+  }
+
+  int size() const { return kNumPatchesPerBank; }
+
+public:
   char name_[kMaxNameLength] = {0};
-  int number_ = 0;
 
-  friend class PatchBank;
-  friend class PatchBrowser;
-
-  void set_number(int n) { number_ = n; }
+  std::array<Patch, kNumPatchesPerBank> patches_;
 };
 
 }  // namespace pfm2sid::synth
-
-#endif  // PFM2SID_SYNTH_PATCH_H_

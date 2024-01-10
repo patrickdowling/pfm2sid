@@ -24,6 +24,7 @@
 
 #include <cinttypes>
 
+#include "menu/patch_browser.h"
 #include "menu_util.h"
 #include "pfm2sid.h"
 #include "pfm2sid_stats.h"
@@ -33,6 +34,7 @@
 #include "synth/patch.h"
 #include "synth/sid_synth.h"
 #include "ui/display.h"
+#include "ui/ui.h"
 
 namespace pfm2sid {
 
@@ -42,6 +44,8 @@ extern synth::Engine engine;
 extern synth::SIDSynth sid_synth_;
 
 namespace synth {
+
+PatchBrowser patch_browser;
 
 static constexpr EditorPageDef editor_page_defs[] = {
     {},  // NONE
@@ -95,13 +99,12 @@ void SIDSynthEditor::MenuInit()
   voice_mode_ = current_patch.parameters.get<GLOBAL::VOICE_MODE, VOICE_MODE>();
 }
 
-void SIDSynthEditor::HandleMenuEvent(MENU_EVENT menu_event)
+void SIDSynthEditor::MenuEnter()
 {
-  if (MENU_EVENT::ENTER == menu_event) {
-    engine.Reset();
-    if (menu_level_ < 0) SetMenuLevel(0);
-  }
+  engine.Reset();
+  if (menu_level_ < 0) SetMenuLevel(0);
 }
+
 void SIDSynthEditor::HandleEvent(const Event &event)
 {
   switch (event.type) {
@@ -119,6 +122,10 @@ void SIDSynthEditor::HandleEvent(const Event &event)
       break;
     case EVENT_BUTTON_LONG_PRESS:
       switch (event.control) {
+        case CONTROL::SWITCH6:
+          patch_browser.set_back(this);
+          ui.SetMenu(&patch_browser);
+          break;
         case CONTROL::SWITCH7: SetMenuLevel(6, true); break;
         default: break;
       }

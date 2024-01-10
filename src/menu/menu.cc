@@ -1,6 +1,6 @@
 // pfm2sid: PreenFM2 meets SID
 //
-// Copyright (C) 2023-2024 Patrick Dowling (pld@gurkenkiste.com)
+// Copyright (C) 2024 Patrick Dowling (pld@gurkenkiste.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,35 +20,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-#ifndef PFM2SID_SYNTH_PATCH_H_
-#define PFM2SID_SYNTH_PATCH_H_
+#include "ui/menu.h"
 
-#include "synth/parameter_structs.h"
+#include "ui/display.h"
 
-namespace pfm2sid::synth {
+namespace pfm2sid {
 
-class PatchBank;
-class PatchBrowser;
+void Menu::HandleMenuEvent(MENU_EVENT menu_event)
+{
+  switch (menu_event) {
+    case MENU_EVENT::ENTER:
+      display.EnableStatusBar(enable_status_bar());
+      MenuEnter();
+      break;
+    case MENU_EVENT::EXIT: MenuExit(); break;
+  }
+}
 
-class Patch {
-public:
-  Patch() : name_{"Default"} {}
-
-  int number() const { return number_; }
-  const char *name() const { return name_; }
-
-  Parameters parameters;
-
-private:
-  char name_[kMaxNameLength] = {0};
-  int number_ = 0;
-
-  friend class PatchBank;
-  friend class PatchBrowser;
-
-  void set_number(int n) { number_ = n; }
-};
-
-}  // namespace pfm2sid::synth
-
-#endif  // PFM2SID_SYNTH_PATCH_H_
+}  // namespace pfm2sid
