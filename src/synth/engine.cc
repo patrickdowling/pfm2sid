@@ -71,6 +71,12 @@ void Engine::set_chip_model()
 
 static short render_buffer[kSampleBlockSize] INCCMZ;
 
+// NOTE
+// With an incorrect clock_delta_t value, the single call to clock(...) doesn't return
+// kSampleBlockSize samples. It could either be called in a while loop until we have enough, but
+// using ceil to calculate the factor also "seems to work". There's probably also a way to calculate
+// the error and work around it that way (the sample tracking internally is a 16.16 value).
+
 void Engine::RenderBlock(SampleBuffer::MutableBlock block, const sidbits::RegisterMap &register_map)
 {
   WriteRegisterMap(register_map);

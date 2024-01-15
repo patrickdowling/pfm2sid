@@ -23,6 +23,8 @@
 #ifndef PFM2SID_ENGINE_H_
 #define PFM2SID_ENGINE_H_
 
+#include <cmath>
+
 #include "sid.h"
 #include "synth/parameter_listener.h"
 #include "synth/parameter_structs.h"
@@ -38,8 +40,9 @@ namespace pfm2sid::synth {
 //
 class Engine : public ParameterListener {
 public:
+  // \sa RenderBlock
   static constexpr reSID::cycle_count clock_delta_t =
-      sidbits::CLOCK_FREQ_PAL / ((float)kDacUpdateRateHz / (float)kSampleBlockSize) + .5f;
+      ceilf(sidbits::CLOCK_FREQ_PAL / (float)kDacUpdateRateHz * (float)kSampleBlockSize);
 
   Engine() = default;
   DELETE_COPY_MOVE(Engine);

@@ -52,7 +52,6 @@ So yes, this project is a super convoluted way of writing a few 8-bit registers 
 
 ## General Miscellany
 
-- Some sample rates and smaller block sizes appeared to produce clicking on the output; might be an interpolation artefact or just underrun?
 - The "ADSR delay bug" is emulated. This could be made optional.
 
 ## TODO-dilly-do
