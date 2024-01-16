@@ -57,8 +57,7 @@ public:
   void AllNotesOff();
   void Pitchbend(midi::Channel channel, int16_t bend)
   {
-    (void)channel;
-    pitch_bend_ = static_cast<float>(bend) / 8192.f;
+    if (channel == midi_channel_) pitch_bend_ = static_cast<float>(bend) / 8192.f;
   }
 
   bool voice_active(unsigned i) { return voices_[i].active(); }
@@ -69,10 +68,20 @@ public:
   // ParameterListener hooks
   void GlobalParameterChanged(GLOBAL parameter) final;
 
+  void set_midi_channel(midi::Channel midi_channel)
+  {
+    if (midi_channel != midi_channel_) {
+      AllNotesOff();
+      midi_channel_ = midi_channel;
+    }
+  }
+
 private:
   Parameters *parameters_ = nullptr;
 
   sidbits::RegisterMap register_map_;
+
+  midi::Channel midi_channel_ = 0;
 
   SIDVoice voices_[kVoiceCount];
   Lfo lfo_[kNumLfos];

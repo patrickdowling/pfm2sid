@@ -144,17 +144,17 @@ public:
     using namespace synth;
     if (SYSTEM::MIDI_CHANNEL == parameter) {
       auto value = system_parameters.get<SYSTEM::MIDI_CHANNEL>().value();
-      if (value > 0 && value <= 16) {
-        set_rx_channel(value - 1);
-        if (MODE::SID_SYNTH == current_mode) sid_synth_.AllNotesOff();
-      }
+      if (value > 0 && value <= 16) { set_rx_channel(value - 1); }
     }
   }
 
-  void set_rx_channel(unsigned channel)
+  void set_rx_channel(midi::Channel channel)
   {
     enabled_channels_.reset();
     enabled_channels_[channel] = true;
+    if (MODE::SID_SYNTH == current_mode) {
+      sid_synth_.set_midi_channel(channel);
+    }
   }
 };
 

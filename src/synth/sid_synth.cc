@@ -73,16 +73,14 @@ void SIDSynth::GlobalParameterChanged(GLOBAL parameter)
 void SIDSynth::SetVoiceMode(VOICE_MODE voice_mode, bool force /*= false*/)
 {
   if (voice_mode_ != voice_mode || force) {
-    for (auto &v : voices_) v.Reset();
+    AllNotesOff();
 
     switch (voice_mode) {
-      case VOICE_MODE::UNISON:
-        voice_allocator_mono_.Clear();
-        for (auto &v : voices_) v.set_parameter_voice(v.sid_voice());
-        break;
       case VOICE_MODE::POLY:
-        voice_allocator_poly_.Clear();
         for (auto &v : voices_) v.set_parameter_voice(sidbits::VOICE1);
+        break;
+      case VOICE_MODE::UNISON:
+        for (auto &v : voices_) v.set_parameter_voice(v.sid_voice());
         break;
     }
     voice_mode_ = voice_mode;
@@ -92,6 +90,8 @@ void SIDSynth::SetVoiceMode(VOICE_MODE voice_mode, bool force /*= false*/)
 void SIDSynth::NoteOn([[maybe_unused]] midi::Channel channel, midi::Note note,
                       midi::Velocity velocity)
 {
+  if (channel != midi_channel_) return;
+
   bool note_on = false;
   if (velocity) {
     switch (voice_mode_) {
@@ -124,6 +124,7 @@ void SIDSynth::NoteOn([[maybe_unused]] midi::Channel channel, midi::Note note,
 void SIDSynth::NoteOff([[maybe_unused]] midi::Channel channel, midi::Note note,
                        midi::Velocity /*velocity*/)
 {
+  if (channel != midi_channel_) return;
   played_notes_.NoteOff(note);
   switch (voice_mode_) {
     case VOICE_MODE::POLY: {
