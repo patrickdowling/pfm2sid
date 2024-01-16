@@ -152,9 +152,7 @@ public:
   {
     enabled_channels_.reset();
     enabled_channels_[channel] = true;
-    if (MODE::SID_SYNTH == current_mode) {
-      sid_synth_.set_midi_channel(channel);
-    }
+    if (MODE::SID_SYNTH == current_mode) { sid_synth_.set_midi_channel(channel); }
   }
 };
 
@@ -164,6 +162,7 @@ static synth::SampleBuffer sample_buffer INCCM;
 
 static void Init()
 {
+  NVIC_SetVectorTable(NVIC_VectTab_FLASH, FLASH_ORIGIN - NVIC_VectTab_FLASH);  // expects an offset
   PFM2SID_DEBUG_INIT();
 
   GPIO::EnableClocks(true);

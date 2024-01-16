@@ -27,7 +27,7 @@ Bonus features:
 ## Caveats
 
 - It's only been run on my PreenFM2 R4 PCB with a LCD, i.e. "works for me".
-- No support for the original bootloader. Or any bootloader, it gets flashed via SWD.
+- While it can optionally be built to hopefully support the original bootloader, this does cost the first 256K of flash. And I generally just upload via SWD or in gdb anyway.
 - It wasn't _necessary_ to implement a MIDI parser but I had some knowledge gaps to fill.
 - DIN MIDI only.
 - The UI is ad hoc, so it's mostly functional but not "designed".
