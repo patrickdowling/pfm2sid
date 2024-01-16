@@ -177,6 +177,7 @@ static void Init()
   sid_synth_editor_.MenuInit();
   sid_synth_editor_.register_listener(&engine);
   sid_synth_editor_.register_listener(&sid_synth_);
+  sid_synth_editor_.register_listener(&midi_handler);
 
   core_timer.Start();
   STM32X_CORE_INIT(F_CPU / kSysTickUpdateHz);
