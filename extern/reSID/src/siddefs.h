@@ -66,6 +66,12 @@ const char* resid_version_string = VERSION;
 #define RESID_INLINING 1
 #define RESID_INLINE inline
 
+#ifdef RESID_RAW_OUTPUT
+typedef int output_sample_t;
+#else
+typedef short output_sample_t;
+#endif
+
 } // namespace reSID
 
 #endif // not __SIDDEFS_H__

@@ -105,6 +105,7 @@ void SID::input(int input_sample)
 // ----------------------------------------------------------------------------
 RESID_INLINE int SID::output() const
 {
+#ifndef RESID_RAW_OUTPUT
   const int range = 1 << 16;
   const int half = range >> 1;
   int output_sample = extfilt.output()/((4095*255 >> 7)*3*15*2/range);
@@ -115,6 +116,9 @@ RESID_INLINE int SID::output() const
     return -half;
   }
   return output_sample;
+#else
+  return extfilt.output();
+#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -746,7 +750,7 @@ RESID_INLINE
 int SID::clock_fast(cycle_count& delta_t, short* buf, int n,
 		    int interleave)
 #else
-int SID::clock(cycle_count& delta_t, short* buf, int n, int interleave)
+int SID::clock(cycle_count& delta_t, output_sample_t* buf, int n, int interleave)
 #endif
 {
   int s = 0;

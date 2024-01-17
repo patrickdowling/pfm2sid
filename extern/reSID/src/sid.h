@@ -50,7 +50,7 @@ public:
 
   void clock();
   void clock(cycle_count delta_t);
-  int clock(cycle_count& delta_t, short* buf, int n, int interleave = 1);
+  int clock(cycle_count& delta_t, output_sample_t* buf, int n, int interleave = 1);
   void reset();
   
   // Read/write registers.
