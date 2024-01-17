@@ -69,7 +69,7 @@ void Engine::set_chip_model()
   Reset();
 }
 
-static short render_buffer[kSampleBlockSize] INCCMZ;
+static reSID::output_sample_t render_buffer[kSampleBlockSize] INCCMZ;
 
 // NOTE
 // With an incorrect clock_delta_t value, the single call to clock(...) doesn't return
@@ -88,7 +88,10 @@ void Engine::RenderBlock(SampleBuffer::MutableBlock block, const sidbits::Regist
   }
 
   auto src = render_buffer;
-  for (auto &dst : block) { dst.left = dst.right = (*src++) << 2; }
+  for (auto &dst : block) {
+    auto s = *src++ >> 2;
+    dst.left = dst.right = __SSAT(s, 18);
+  }
 }
 
 }  // namespace pfm2sid::synth
