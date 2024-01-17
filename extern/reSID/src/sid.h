@@ -83,9 +83,7 @@ public:
   void input(int sample);
 
   // 16-bit output (AUDIO OUT).
-  int output();
-  // n-bit output.
-  int output(int bits);
+  RESID_INLINE int output() const;
 
 protected:
   static double I0(double x);

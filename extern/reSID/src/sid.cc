@@ -99,9 +99,8 @@ void SID::input(int input_sample)
 
 // ----------------------------------------------------------------------------
 // Read sample from audio output.
-// Both 16-bit and n-bit output is provided.
 // ----------------------------------------------------------------------------
-int SID::output()
+RESID_INLINE int SID::output() const
 {
   const int range = 1 << 16;
   const int half = range >> 1;
@@ -114,21 +113,6 @@ int SID::output()
   }
   return output_sample;
 }
-
-int SID::output(int bits)
-{
-  const int range = 1 << bits;
-  const int half = range >> 1;
-  int output_sample = extfilt.output()/((4095*255 >> 7)*3*15*2/range);
-  if (output_sample >= half) {
-    return half - 1;
-  }
-  if (output_sample < -half) {
-    return -half;
-  }
-  return output_sample;
-}
-
 
 // ----------------------------------------------------------------------------
 // Read registers.
