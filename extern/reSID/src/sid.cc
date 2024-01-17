@@ -27,10 +27,11 @@ namespace reSID {
 // ----------------------------------------------------------------------------
 SID::SID()
 {
+#ifdef RESID_ENABLE_INTERPOLATE
   // Initialize pointers.
   sample = nullptr;
   fir = nullptr;
-
+#endif
   voice[0].set_sync_source(&voice[2]);
   voice[1].set_sync_source(&voice[0]);
   voice[2].set_sync_source(&voice[1]);
@@ -49,8 +50,10 @@ SID::SID()
 // ----------------------------------------------------------------------------
 SID::~SID()
 {
+#ifdef RESID_ENABLE_INTERPOLATE
   delete[] sample;
   delete[] fir;
+#endif
 }
 
 
@@ -371,7 +374,7 @@ void SID::enable_external_filter(bool enable)
   extfilt.enable_filter(enable);
 }
 
-
+#ifdef RESID_ENABLE_INTERPOLATE
 // ----------------------------------------------------------------------------
 // I0() computes the 0th order modified Bessel function of the first kind.
 // This function is originally from resample-1.5/filterkit.c by J. O. Smith.
@@ -395,7 +398,7 @@ double SID::I0(double x)
 
   return sum;
 }
-
+#endif
 
 // ----------------------------------------------------------------------------
 // Setting of SID sampling parameters.
@@ -419,6 +422,7 @@ double SID::I0(double x)
 // to slightly below 20kHz. This constraint ensures that the FIR table is
 // not overfilled.
 // ----------------------------------------------------------------------------
+#ifdef RESID_ENABLE_INTERPOLATE
 bool SID::set_sampling_parameters(double clock_freq, sampling_method method,
 				  double sample_freq, double pass_freq,
 				  double filter_scale)
@@ -450,16 +454,21 @@ bool SID::set_sampling_parameters(double clock_freq, sampling_method method,
       return false;
     }
   }
-
+#else
+bool SID::set_sampling_parameters(float clock_freq, sampling_method method, float sample_freq)
+{
+  if (method != SAMPLE_FAST) return false;
+#endif
   clock_frequency = clock_freq;
   sampling = method;
 
   cycles_per_sample =
-    cycle_count(clock_freq/sample_freq*(1 << FIXP_SHIFT) + 0.5);
+    cycle_count(clock_freq/sample_freq*(1 << FIXP_SHIFT) + 0.5f);
 
   sample_offset = 0;
   sample_prev = 0;
 
+#ifdef RESID_ENABLE_INTERPOLATE
   // FIR initialization is only necessary for resampling.
   if (method != SAMPLE_RESAMPLE_INTERPOLATE && method != SAMPLE_RESAMPLE_FAST)
   {
@@ -540,11 +549,11 @@ bool SID::set_sampling_parameters(double clock_freq, sampling_method method,
     sample[j] = 0;
   }
   sample_index = 0;
-
+#endif
   return true;
 }
 
-
+#ifdef RESID_ENABLE_INTERPOLATE
 // ----------------------------------------------------------------------------
 // Adjustment of SID sampling frequency.
 //
@@ -562,6 +571,7 @@ void SID::adjust_sampling_frequency(double sample_freq)
   cycles_per_sample =
     cycle_count(clock_frequency/sample_freq*(1 << FIXP_SHIFT) + 0.5);
 }
+#endif
 
 
 // ----------------------------------------------------------------------------
@@ -713,6 +723,7 @@ void SID::clock(cycle_count delta_t)
 // }
 // 
 // ----------------------------------------------------------------------------
+#ifdef RESID_ENABLE_INTERPOLATE
 int SID::clock(cycle_count& delta_t, short* buf, int n, int interleave)
 {
   switch (sampling) {
@@ -734,6 +745,9 @@ int SID::clock(cycle_count& delta_t, short* buf, int n, int interleave)
 RESID_INLINE
 int SID::clock_fast(cycle_count& delta_t, short* buf, int n,
 		    int interleave)
+#else
+int SID::clock(cycle_count& delta_t, short* buf, int n, int interleave)
+#endif
 {
   int s = 0;
 
@@ -758,7 +772,7 @@ int SID::clock_fast(cycle_count& delta_t, short* buf, int n,
   return s;
 }
 
-
+#ifdef RESID_ENABLE_INTERPOLATE
 // ----------------------------------------------------------------------------
 // SID clocking with audio sampling - cycle based with linear sample
 // interpolation.
@@ -991,5 +1005,5 @@ int SID::clock_resample_fast(cycle_count& delta_t, short* buf, int n,
   delta_t = 0;
   return s;
 }
-
+#endif // RESID_ENABLE_INTERPOLATE
 } // namespace reSID

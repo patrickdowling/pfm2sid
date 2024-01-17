@@ -37,11 +37,14 @@ public:
   void set_chip_model(chip_model model);
   void enable_filter(bool enable);
   void enable_external_filter(bool enable);
+#ifdef RESID_ENABLE_INTERPOLATE
   bool set_sampling_parameters(double clock_freq, sampling_method method,
 			       double sample_freq, double pass_freq = -1,
 			       double filter_scale = 0.97);
   void adjust_sampling_frequency(double sample_freq);
-
+#else
+  bool set_sampling_parameters(float clock_freq, sampling_method method, float sample_freq);
+#endif
   void fc_default(const fc_point*& points, int& count);
   PointPlotter<sound_sample> fc_plotter();
 
@@ -86,6 +89,7 @@ public:
   RESID_INLINE int output() const;
 
 protected:
+#ifdef RESID_ENABLE_INTERPOLATE
   static double I0(double x);
   RESID_INLINE int clock_fast(cycle_count& delta_t, short* buf, int n,
 			      int interleave);
@@ -95,7 +99,7 @@ protected:
 					      int n, int interleave);
   RESID_INLINE int clock_resample_fast(cycle_count& delta_t, short* buf,
 				       int n, int interleave);
-
+#endif
   Voice voice[3];
   Filter filter;
   ExternalFilter extfilt;
@@ -110,6 +114,7 @@ protected:
   // External audio input.
   int ext_in;
 
+#ifdef RESID_ENABLE_INTERPOLATE
   // Resampling constants.
   // The error in interpolated lookup is bounded by 1.234/L^2,
   // while the error in non-interpolated lookup is bounded by
@@ -122,7 +127,7 @@ protected:
   static const int FIR_RES_FAST = 51473;
   static const int FIR_SHIFT = 15;
   static const int RINGSIZE = 16384;
-
+#endif
   // Fixpoint constants (16.16 bits).
   static const int FIXP_SHIFT = 16;
   static const int FIXP_MASK = 0xffff;
@@ -133,6 +138,7 @@ protected:
   cycle_count sample_offset;
   int sample_index;
   short sample_prev;
+#ifdef RESID_ENABLE_INTERPOLATE
   int fir_N;
   int fir_RES;
 
@@ -141,6 +147,7 @@ protected:
 
   // FIR_RES filter tables (FIR_N*FIR_RES).
   short* fir;
+#endif
 };
 
 } // namespace reSID

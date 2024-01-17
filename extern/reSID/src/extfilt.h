@@ -50,7 +50,7 @@ public:
   void reset();
 
   // Audio output (20 bits).
-  RESID_INLINE sound_sample output();
+  RESID_INLINE sound_sample output() const;
 
 protected:
   // Filter enabled.
@@ -156,7 +156,7 @@ void ExternalFilter::clock(cycle_count delta_t,
 // Audio output (19.5 bits).
 // ----------------------------------------------------------------------------
 RESID_INLINE
-sound_sample ExternalFilter::output()
+sound_sample ExternalFilter::output() const
 {
   return Vo;
 }
