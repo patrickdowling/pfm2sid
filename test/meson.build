@@ -3,7 +3,7 @@ project('pfm2sid', 'cpp', default_options: ['cpp_std=c++17', 'warning_level=3', 
 inc = [
   '../src',
   '../resources',
-  '../stm32x',
+  '../stm32x/include',
   '../extern'
   ]
 
