@@ -156,19 +156,24 @@ void SIDSynthEditor::UpdateDisplay() const
     display.Fmt(1, "Clk: %luMHz", SystemCoreClock / 1000UL / 1000UL);
     display.Fmt(2, "Eng: %4.1fx%" PRIu32 " dt=%u",
                 PRINT_F32(static_cast<float>(kDacUpdateRateHz) / 1000.f), kSampleBlockSize,
-                Engine::clock_delta_t);
+                SIDInstance::clock_delta_t);
     display.Fmt(3, "Mod: %4.1f", PRINT_F32(kModulatorUpdateRateHz));
     return;
   }
 
   if (editor_page_ == EDITOR_PAGE::STATS) {
-    constexpr uint32_t blk_max =
-        static_cast<uint32_t>((1000.f * 1000.f) / (static_cast<float>(kDacUpdateRateHz) /
-                                                   static_cast<float>(kSampleBlockSize)) +
-                              .5f);
-    display.Fmt(0, "blk %4" PRIu32 "/%" PRIu32 "us", stats::render_block_cycles.value_in_us(),
+    constexpr float blk_max_f = (1000.f * 1000.f) / static_cast<float>(kDacUpdateRateHz) *
+                                static_cast<float>(kSampleBlockSize);
+    constexpr uint32_t blk_max = static_cast<uint32_t>(blk_max_f + .5f);
+
+    auto load = static_cast<float>(stats::render_block_cycles.value_in_us()) / blk_max_f * 100.f;
+
+    display.Fmt(0, "load %3.0f%%", PRINT_F32(load));
+    display.Fmt(1, "blk  %4" PRIu32 " %4" PRIu32 " %4" PRIu32,
+                stats::render_block_cycles.value_in_us(), stats::render_block_cycles.max_in_us(),
                 blk_max);
-    display.Fmt(1, "sid %4" PRIu32 "us", stats::sid_clock_cycles.value_in_us());
+    display.Fmt(2, "sid  %4" PRIu32 " %4" PRIu32, stats::sid_clock_cycles.value_in_us(),
+                stats::sid_clock_cycles.max_in_us());
     // display.Fmt(3, "%.3f", sid_synth_.bend());
     return;
   }

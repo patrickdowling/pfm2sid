@@ -26,7 +26,6 @@
 
 #include "misc/platform.h"
 #include "pfm2sid_stats.h"
-#include "sidbits/sidbits.h"
 #include "stm32x/stm32x_core.h"
 #include "stm32x/stm32x_debug.h"
 #include "synth.h"
@@ -35,18 +34,23 @@ ENABLE_WCONVERSION()
 
 namespace pfm2sid::synth {
 
+namespace detail {
+template <>
+constexpr auto typed_value<reSID::chip_model>(pfm2sid::synth::parameter_value_type value)
+{
+  return value ? reSID::MOS8580 : reSID::MOS6581;
+}
+}  // namespace detail
+
 void Engine::Init(Parameters *parameters)
 {
   parameters_ = parameters;
-
-  sid_.set_sampling_parameters(sidbits::CLOCK_FREQ_PAL, reSID::SAMPLE_FAST, kDacUpdateRateHz);
-  set_chip_model();
+  sid_instance_.Init(parameters_->get<GLOBAL::CHIP_MODEL, reSID::chip_model>());
 }
 
 void Engine::Reset()
 {
-  cached_registers_.Reset();
-  sid_.reset();
+  sid_instance_.Reset();
 }
 
 void Engine::SystemParameterChanged(SYSTEM parameter)
@@ -56,17 +60,9 @@ void Engine::SystemParameterChanged(SYSTEM parameter)
 
 void Engine::GlobalParameterChanged(GLOBAL parameter)
 {
-  if (GLOBAL::CHIP_MODEL == parameter) { set_chip_model(); }
-}
-
-void Engine::set_chip_model()
-{
-  if (parameters_->get<GLOBAL::CHIP_MODEL>().value()) {
-    sid_.set_chip_model(reSID::MOS8580);
-  } else {
-    sid_.set_chip_model(reSID::MOS6581);
+  if (GLOBAL::CHIP_MODEL == parameter) {
+    sid_instance_.set_chip_model(parameters_->get<GLOBAL::CHIP_MODEL, reSID::chip_model>());
   }
-  Reset();
 }
 
 static reSID::output_sample_t render_buffer[kSampleBlockSize] INCCMZ;
@@ -79,12 +75,9 @@ static reSID::output_sample_t render_buffer[kSampleBlockSize] INCCMZ;
 
 void Engine::RenderBlock(SampleBuffer::MutableBlock block, const sidbits::RegisterMap &register_map)
 {
-  WriteRegisterMap(register_map);
-
   {
     stm32x::ScopedCycleMeasurement scm{stats::sid_clock_cycles};
-    auto delta_t = clock_delta_t;
-    sid_.clock(delta_t, render_buffer, kSampleBlockSize, 1);
+    sid_instance_.Render(render_buffer, kSampleBlockSize, register_map);
   }
 
   auto src = render_buffer;
