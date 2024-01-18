@@ -470,9 +470,8 @@ bool SID::set_sampling_parameters(float clock_freq, sampling_method method, floa
     cycle_count(clock_freq/sample_freq*(1 << FIXP_SHIFT) + 0.5f);
 
   sample_offset = 0;
-  sample_prev = 0;
-
 #ifdef RESID_ENABLE_INTERPOLATE
+  sample_prev = 0;
   // FIR initialization is only necessary for resampling.
   if (method != SAMPLE_RESAMPLE_INTERPOLATE && method != SAMPLE_RESAMPLE_FAST)
   {

@@ -137,8 +137,8 @@ protected:
   cycle_count cycles_per_sample;
   cycle_count sample_offset;
   int sample_index;
-  short sample_prev;
 #ifdef RESID_ENABLE_INTERPOLATE
+  short sample_prev;
   int fir_N;
   int fir_RES;
 
