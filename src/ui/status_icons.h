@@ -50,10 +50,10 @@ constexpr char to_char(resources::LCD_CHAR_RESID c)
   return 1 + c;
 }
 
-static constexpr char ICON_MIDI_NOTE = '.';
+static constexpr char ICON_MIDI_NOTE = to_char<resources::LCD_CHAR_NOTE>();
 static constexpr char ICON_MIDI_BEND = to_char<resources::LCD_CHAR_BEND>();
 static constexpr char ICON_MIDI_SYSEX = '!';
-static constexpr char ICON_VOICE_ACTIVE = to_char<resources::LCD_CHAR_NOTE>();
+static constexpr char ICON_VOICE_ACTIVE = to_char<resources::LCD_CHAR_VOICE_X1>();
 
 static constexpr char ICON_PATCH_LOAD = LEFT_ARROW_CHAR;
 static constexpr char ICON_PATCH_SAVE = RIGHT_ARROW_CHAR;

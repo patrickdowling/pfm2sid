@@ -123,7 +123,8 @@ void Lcd::Init()
 
 void Lcd::Clear()
 {
-  WriteCommandImmediate(LCD_CLEAR);
+  WriteCommandImmediate(LCD_CLEAR, 1500);
+  WriteCommandImmediate(LCD_HOME, 1500);
 }
 
 void Lcd::MoveCursor(uint8_t row, uint8_t col)
@@ -147,7 +148,7 @@ void Lcd::Print(const char *str, size_t len)
 
 void Lcd::DefineUserChar(uint8_t index, const uint8_t *data)
 {
-  WriteCommandImmediate(LCD_SET_CGRAM_ADDRESS | (index << 3));
+  WriteCommandImmediate(LCD_SET_CGRAM_ADDRESS | (index * 8));
   for (int i = 0; i < 8; ++i) WriteDataImmediate(data[i]);
 }
 

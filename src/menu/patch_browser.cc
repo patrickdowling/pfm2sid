@@ -46,14 +46,14 @@ void PatchBrowser::HandleEvent(const Event &event)
     cursor_.Scroll(event.value);
   } else if (EVENT_BUTTON_PRESS == event.type) {
     switch (event.control) {
-      case CONTROL::SWITCH7:
+      case CONTROL::SWITCH6:
         if (saving_)
           Save();
         else
           Load();
         Exit();
         break;
-      case CONTROL::SWITCH6: Exit(); break;
+      case CONTROL::SWITCH7: Exit(); break;
       default: break;
     }
   } else if (EVENT_BUTTON_LONG_PRESS == event.type) {

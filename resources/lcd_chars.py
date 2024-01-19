@@ -21,14 +21,13 @@ custom_characters = {
 ...XX
 ...XX
 ...X.
-...X.
 .XXX.
 XXXX.
 .XX..
+.....
 """,
 'bend' :
 """
-.....
 .....
 .....
 ..X..
@@ -36,6 +35,7 @@ XXXX.
 .XXX.
 X...X
 XXXXX
+.....
 """,
 'tri' :
 """
@@ -70,9 +70,32 @@ X.X..
 .....
 .....
 """,
+'voice_x1' :
+"""
+.....
+.....
+.....
+.....
+XXXXX
+XXXXX
+XXXXX
+.....
+""",
+'voice_x2' :
+"""
+XXXXX
+XXXXX
+XXXXX
+.....
+XXXXX
+XXXXX
+XXXXX
+.....
+"""
 }
 
 def BuildResourceTable():
+    assert len(custom_characters) < 8
     resource_table = {
             'name' : 'lcd_char',
             'prefix' : 'LCD_CHAR',

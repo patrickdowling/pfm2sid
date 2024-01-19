@@ -122,11 +122,8 @@ void SIDSynthEditor::HandleEvent(const Event &event)
       break;
     case EVENT_BUTTON_LONG_PRESS:
       switch (event.control) {
-        case CONTROL::SWITCH6:
-          patch_browser.set_back(this);
-          ui.SetMenu(&patch_browser);
-          break;
-        case CONTROL::SWITCH7: SetMenuLevel(6, true); break;
+        case CONTROL::SWITCH6: break;
+        case CONTROL::SWITCH7: ui.SetMenu(&patch_browser);
         default: break;
       }
     case EVENT_BUTTON_RELEASE: break;
@@ -187,7 +184,7 @@ void SIDSynthEditor::UpdateDisplay() const
   {
     const auto &page_def = editor_page_defs[util::enum_to_i(editor_page_)];
 
-    display.Fmt(0, "%02d %s", current_patch.number(), current_patch.name());
+    display.Fmt(0, "%02d %-12s%d", current_patch.number(), current_patch.name(), 1);
 
     char buf[20] = {0};
     switch (page_def.parameter_type) {

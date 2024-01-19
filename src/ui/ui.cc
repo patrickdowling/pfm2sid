@@ -43,6 +43,7 @@ void Ui::Init()
   for (int i = 0; i < resources::LCD_CHAR_LAST; ++i) {
     lcd.DefineUserChar(to_char(static_cast<resources::LCD_CHAR_RESID>(i)), resources::lcd_chars[i]);
   }
+  lcd.Clear();
   display.Clear();
 }
 
@@ -163,6 +164,7 @@ void Ui::SetMenu(Menu *menu)
     if (menu) {
       //display.Fmt(0, "%-16s", menu->name());
       menu->HandleMenuEvent(MENU_EVENT::ENTER);
+      menu->set_back(current_menu_);
     }
     current_menu_ = menu;
   }
