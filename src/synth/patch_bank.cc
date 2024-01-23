@@ -20,33 +20,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-#include "synth/patch.h"
+#include "synth/patch_bank.h"
 
 namespace pfm2sid::synth {
 
-class PatchBank {
-public:
-  PatchBank() : name_{"Default"} {}
+/*static*/ PatchBank PatchBank::default_bank()
+{
+  PatchBank bank;
 
-  const char *name() const { return name_; }
-
-  auto &operator[](size_t i) const { return patches_[i]; }
-
-  auto &Load(size_t i) const { return patches_[i]; }
-  auto &Save(size_t i, const Patch &patch)
-  {
-    patches_[i] = patch;
-    return patches_[i];
-  }
-
-  int size() const { return kNumPatchesPerBank; }
-
-  static PatchBank default_bank();
-
-private:
-  char name_[kMaxNameLength] = {0};
-
-  std::array<Patch, kNumPatchesPerBank> patches_;
-};
+  return bank;
+}
 
 }  // namespace pfm2sid::synth

@@ -70,7 +70,18 @@ X.X..
 .....
 .....
 """,
-'voice_x1' :
+'voice_t' :
+"""
+.....
+XXXXX
+XXXXX
+XXXXX
+.....
+.....
+.....
+.....
+""",
+'voice_b' :
 """
 .....
 .....
@@ -81,7 +92,7 @@ XXXXX
 XXXXX
 .....
 """,
-'voice_x2' :
+'voice_tb' :
 """
 XXXXX
 XXXXX
@@ -95,7 +106,7 @@ XXXXX
 }
 
 def BuildResourceTable():
-    assert len(custom_characters) < 8
+    assert len(custom_characters) <= 8
     resource_table = {
             'name' : 'lcd_char',
             'prefix' : 'LCD_CHAR',

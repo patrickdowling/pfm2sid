@@ -65,7 +65,7 @@ static midi::MidiParser serial_midi_parser INCCM;
 static MODE current_mode = MODE::INVALID;
 synth::SystemParameters system_parameters INCCM;
 
-synth::PatchBank current_bank INCCM;
+synth::PatchBank current_bank INCCM = synth::PatchBank::default_bank();
 synth::Patch current_patch INCCM;
 
 synth::Engine engine INCCM;
