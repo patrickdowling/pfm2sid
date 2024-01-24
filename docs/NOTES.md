@@ -14,3 +14,7 @@ This works out as `extfilt.output()/11` for the default 16-bit range. My guess i
 ![plot](./20_16.png)
 
 In this use case we might prefer an 18-bit value anyway and have floats available, so it may be simplified to just output the _raw_ value and we'll post-process it later, e.g. soft clipping. This also avoids moving platform-specifics like `__SSAT` into the reSID code.
+
+
+### Clocking
+- By using a fixed (or compile-time) `cycles_per_sample` and `clock_delta_t` which could just skip all the sample tracking? 
