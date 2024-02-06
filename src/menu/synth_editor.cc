@@ -25,6 +25,7 @@
 #include <cinttypes>
 
 #include "menu/patch_browser.h"
+#include "menu/wavetable_editor.h"
 #include "menu_util.h"
 #include "pfm2sid.h"
 #include "pfm2sid_stats.h"
@@ -46,6 +47,7 @@ extern synth::SIDSynth sid_synth_;
 namespace synth {
 
 PatchBrowser patch_browser;
+WavetableEditor wavetable_editor;
 
 static constexpr EditorPageDef editor_page_defs[] = {
     {},  // NONE
