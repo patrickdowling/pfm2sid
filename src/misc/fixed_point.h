@@ -137,7 +137,10 @@ public:
   {
     if constexpr (enable_saturate) saturate();
   }
-  FixedPoint& operator=(const FixedPoint& rhs) = default;
+  constexpr FixedPoint(const FixedPoint &) = default;
+  constexpr FixedPoint &operator=(FixedPoint &&) = default;
+  constexpr FixedPoint(FixedPoint &&) = default;
+  constexpr FixedPoint &operator=(const FixedPoint &) = default;
 
   void assign(int32_t value)
   {
