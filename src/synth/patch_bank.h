@@ -41,7 +41,7 @@ public:
 
   int size() const { return kNumPatchesPerBank; }
 
-  static PatchBank default_bank();
+  static void default_bank(PatchBank &patch_bank);
 
 private:
   char name_[kMaxNameLength] = {0};

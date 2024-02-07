@@ -43,7 +43,7 @@ public:
   SIDSynth() = default;
   DELETE_COPY_MOVE(SIDSynth);
 
-  void Init(Parameters *parameters);
+  void Init(Parameters *parameters, WaveTable *wavetables);
   void Reset();
 
   const auto &register_map() const { return register_map_; }

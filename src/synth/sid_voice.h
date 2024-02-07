@@ -42,7 +42,8 @@ public:
   SIDVoice() = default;
   DELETE_COPY_MOVE(SIDVoice);
 
-  void Init(sidbits::VOICE_INDEX voice_index, const Parameters *parameter);
+  void Init(sidbits::VOICE_INDEX voice_index, const Parameters *parameter,
+            const WaveTable *wavtables);
 
   void Reset();
 
@@ -62,6 +63,7 @@ private:
   sidbits::VOICE_INDEX parameter_voice_ = sidbits::VOICE1;
 
   const Parameters *parameters_ = nullptr;
+  const WaveTable *wavetables_ = nullptr;
 
   midi::Note note_ = midi::INVALID_NOTE;
   uint8_t velocity_ = 0;
@@ -69,7 +71,7 @@ private:
   GATE_STATE gate_state_ = GATE_LOW;
 
   Glide glide_;
-  WaveTableScanner wavetable_;
+  WaveTableScanner wavetable_scanner_;
 };
 
 }  // namespace pfm2sid::synth

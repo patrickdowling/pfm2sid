@@ -24,6 +24,7 @@
 #define PFM2SID_SYNTH_PATCH_H_
 
 #include "synth/parameter_structs.h"
+#include "synth/wavetable.h"
 
 namespace pfm2sid::synth {
 
@@ -38,6 +39,7 @@ public:
   const char *name() const { return name_; }
 
   Parameters parameters;
+  WaveTable wavetables[kNumWaveTables];
 
 private:
   char name_[kMaxNameLength] = {0};

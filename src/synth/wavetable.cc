@@ -22,43 +22,44 @@
 //
 #include "wavetable.h"
 
-#include <ios>
+#include "patch.h"
 
 namespace pfm2sid::synth {
 
-// std::array<WaveTable, kNumWaveTables> wavetables = {
-WaveTable wavetables[kNumWaveTables];
-
-void InitWaveTables()
+void InitWaveTables(Patch &patch)
 {
   {
-    auto &data = wavetables[0].mutable_data();
+    auto &data = patch.wavetables[0].mutable_data();
     data[0] = {0};
     data[1] = {12};
     data[2] = {0};
     data[3] = {12};
     data[4] = {WaveTable::LOOP};
+    patch.wavetables[0].enable<WaveTable::TRANSPOSE>(true);
   }
 
   {
-    auto &data = wavetables[1].mutable_data();
+    auto &data = patch.wavetables[1].mutable_data();
     data[0] = {0, sidbits::OSC_WAVE::TRI};
     data[1] = {0, sidbits::OSC_WAVE::NOISE};
     data[2] = {0, sidbits::OSC_WAVE::PULSE};
     data[3] = {-24, sidbits::OSC_WAVE::PULSE};
     data[3].action = WaveTable::END;
+    patch.wavetables[1].enable<WaveTable::WAVEFORM>(true);
   }
 
   {
-    auto &data = wavetables[2].mutable_data();
+    auto &data = patch.wavetables[2].mutable_data();
     for (int i = 0; i <= 12; ++i) { data[i] = {i}; }
     data[12].action = WaveTable::END;
+    patch.wavetables[2].enable<WaveTable::TRANSPOSE>(true);
   }
 
   {
-    auto &data = wavetables[3].mutable_data();
+    auto &data = patch.wavetables[3].mutable_data();
     for (int i = 0; i <= 12; ++i) { data[i] = {-i}; }
     data[12].action = WaveTable::END;
+    patch.wavetables[3].enable<WaveTable::TRANSPOSE>(true);
   }
 }
 

@@ -30,13 +30,13 @@ ENABLE_WCONVERSION()
 
 namespace pfm2sid::synth {
 
-void SIDSynth::Init(Parameters *parameters)
+void SIDSynth::Init(Parameters *parameters, WaveTable *wavetables)
 {
   parameters_ = parameters;
 
-  voices_[0].Init(sidbits::VOICE1, parameters);
-  voices_[1].Init(sidbits::VOICE2, parameters);
-  voices_[2].Init(sidbits::VOICE3, parameters);
+  voices_[0].Init(sidbits::VOICE1, parameters, wavetables);
+  voices_[1].Init(sidbits::VOICE2, parameters, wavetables);
+  voices_[2].Init(sidbits::VOICE3, parameters, wavetables);
 
   for (auto &lfo : lfo_) lfo.Init(0, 0.f);
 

@@ -31,8 +31,7 @@
 namespace pfm2sid::synth {
 
 static constexpr size_t kNumWaveTables = 4;
-
-// We can afford to be a bit wasteful with the types.
+// Can we afford to be a bit wasteful with the types?
 //
 // This uses fixed-purpose fields rather than generic ones that can be assigned to parameters/CC,
 // which can be added later.
@@ -42,39 +41,28 @@ static constexpr size_t kNumWaveTables = 4;
 
 class WaveTable {
 public:
-  static constexpr size_t kMaxSteps = 128;
+  static constexpr size_t kMaxSteps = 32;
 
   enum ACTION { PLAY, LOOP, END };
   enum TRACK : unsigned { TRANSPOSE, WAVEFORM };
+
+  template <WaveTable::TRACK track>
+  static constexpr auto track_mask() -> unsigned
+  {
+    return 1 << track;
+  }
+
   struct Entry {
     ACTION action = END;
-    unsigned enabled = 0;
 
-    int32_t transpose = 0;
+    int16_t transpose = 0;
     sidbits::OSC_WAVE waveform = sidbits::OSC_WAVE::SILENCE;
-
-    template <TRACK track>
-    constexpr auto is_enabled() const -> bool
-    {
-      return enabled & (1 << track);
-    }
-
-    template <TRACK track>
-    static constexpr auto track_mask() -> unsigned
-    {
-      return 1 << track;
-    }
 
     // template <TRACK track> auto get() const { return values_[track]; }
     constexpr Entry() = default;
     constexpr Entry(ACTION a) : action(a) {}
-    constexpr Entry(int t, sidbits::OSC_WAVE w)
-        : action(PLAY),
-          enabled(track_mask<TRANSPOSE>() | track_mask<WAVEFORM>()),
-          transpose(t),
-          waveform(w)
-    {}
-    constexpr Entry(int t) : action(PLAY), enabled(track_mask<TRANSPOSE>()), transpose(t) {}
+    constexpr Entry(int t, sidbits::OSC_WAVE w) : action(PLAY), transpose(t), waveform(w) {}
+    constexpr Entry(int t) : action(PLAY), transpose(t) {}
   };
 
   auto size() const { return kMaxSteps; }
@@ -86,13 +74,28 @@ public:
 
   auto &mutable_data() { return data_; }
 
+  template <WaveTable::TRACK track>
+  void enable(bool enable)
+  {
+    if (enable)
+      enabled_tracks_ |= track_mask<track>();
+    else
+      enabled_tracks_ &= ~track_mask<track>();
+  }
+
+  template <WaveTable::TRACK track>
+  constexpr auto is_enabled() const -> bool
+  {
+    return enabled_tracks_ & track_mask<track>();
+  }
+
 private:
   std::array<Entry, kMaxSteps> data_;
+  unsigned enabled_tracks_ = 0;
 };
 
-// extern std::array<WaveTable, kNumWaveTables> wavetables;
-extern WaveTable wavetables[kNumWaveTables];
-void InitWaveTables();
+class Patch;
+void InitWaveTables(Patch &);
 
 class WaveTableScanner {
 public:
@@ -124,6 +127,12 @@ public:
 
   auto Update() -> WaveTable::Entry;
 
+  template <WaveTable::TRACK track>
+  constexpr auto is_enabled() const -> bool
+  {
+    return source_ && source_->is_enabled<track>();
+  }
+
 private:
   const WaveTable *source_ = nullptr;
   size_t pos_ = 0;
@@ -141,9 +150,6 @@ constexpr const char *action_to_string(const WaveTable::Entry &entry, char *buf)
     buf[0] = 'E';
   else
     buf[0] = '?';
-  buf[1] = '_';
-  buf[2] = entry.is_enabled<WaveTable::TRANSPOSE>() ? 'T' : '_';
-  buf[3] = entry.is_enabled<WaveTable::WAVEFORM>() ? 'W' : '_';
 
   return buf;
 }

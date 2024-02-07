@@ -24,11 +24,9 @@
 
 namespace pfm2sid::synth {
 
-/*static*/ PatchBank PatchBank::default_bank()
+/*static*/ void PatchBank::default_bank(PatchBank &patch_bank)
 {
-  PatchBank bank;
-
-  return bank;
+  for (auto &patch : patch_bank.patches_) InitWaveTables(patch);
 }
 
 }  // namespace pfm2sid::synth

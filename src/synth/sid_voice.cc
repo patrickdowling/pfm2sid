@@ -36,10 +36,12 @@
 
 namespace pfm2sid::synth {
 
-void SIDVoice::Init(sidbits::VOICE_INDEX voice_index, const Parameters *parameters)
+void SIDVoice::Init(sidbits::VOICE_INDEX voice_index, const Parameters *parameters,
+                    const WaveTable *wavetables)
 {
   sid_voice_ = voice_index;
   parameters_ = parameters;
+  wavetables_ = wavetables;
 }
 
 void SIDVoice::Reset()
@@ -48,7 +50,7 @@ void SIDVoice::Reset()
   velocity_ = 0;
   gate_state_ = GATE_FALLING;  // TODO This is kind of hack to ensure we clear the gate bit
   glide_.Reset();
-  wavetable_.Reset();
+  wavetable_scanner_.Reset();
 }
 
 void SIDVoice::NoteOn(midi::Note note, midi::Velocity velocity, bool glide)
@@ -68,10 +70,10 @@ void SIDVoice::NoteOn(midi::Note note, midi::Velocity velocity, bool glide)
   // We'll only initialze the wavetable on note on, but change the rate later
   auto wavetable_idx = parameters_->get<VOICE::WAVETABLE_IDX>(parameter_voice_).value();
   if (wavetable_idx) {
-    wavetable_.SetSource(&wavetables[wavetable_idx - 1]);
-    wavetable_.set_rate(parameters_->get<VOICE::WAVETABLE_RATE>(parameter_voice_).value());
+    wavetable_scanner_.set_rate(parameters_->get<VOICE::WAVETABLE_RATE>(parameter_voice_).value());
+    wavetable_scanner_.SetSource(&wavetables_[wavetable_idx - 1]);
   } else {
-    wavetable_.Reset();
+    wavetable_scanner_.Reset();
   }
 }
 
@@ -85,9 +87,10 @@ void SIDVoice::Update(sidbits::RegisterMap &register_map, const ModulationValues
 {
   if (active()) {
     WaveTable::Entry wte;
-    if (wavetable_.active()) {
-      wavetable_.set_rate(parameters_->get<VOICE::WAVETABLE_RATE>(parameter_voice_).value());
-      wte = wavetable_.Update();
+    if (wavetable_scanner_.active()) {
+      wavetable_scanner_.set_rate(
+          parameters_->get<VOICE::WAVETABLE_RATE>(parameter_voice_).value());
+      wte = wavetable_scanner_.Update();
     }
 
     // Apply glide to the note value, then apply modulation, then get frequency
@@ -97,7 +100,7 @@ void SIDVoice::Update(sidbits::RegisterMap &register_map, const ModulationValues
     // TODO it's a bit unclear if we should add octave/transpose to the glide target?
     auto note_offset = parameters_->get<VOICE::TUNE_OCTAVE>(parameter_voice_).value() * 12 +
                        parameters_->get<VOICE::TUNE_SEMITONE>(parameter_voice_).value();
-    if (wte.is_enabled<WaveTable::TRANSPOSE>()) note_offset += wte.transpose;
+    if (wavetable_scanner_.is_enabled<WaveTable::TRANSPOSE>()) note_offset += wte.transpose;
 
     note.add_integral(note_offset);
 
@@ -130,7 +133,7 @@ void SIDVoice::Update(sidbits::RegisterMap &register_map, const ModulationValues
     register_map.voice_set_pwm(sid_voice_, pwm);
 
     sidbits::OSC_WAVE wave;
-    if (wte.is_enabled<WaveTable::WAVEFORM>())
+    if (wavetable_scanner_.is_enabled<WaveTable::WAVEFORM>())
       wave = wte.waveform;
     else
       wave = parameters_->get<VOICE::OSC_WAVE, sidbits::OSC_WAVE>(parameter_voice_);

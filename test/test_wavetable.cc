@@ -11,7 +11,7 @@ public:
   constexpr auto format(pfm2sid::synth::WaveTable::Entry& entry, Context& ctx) const
   {
     char buf[5] = {0};
-    return format_to(ctx.out(), "[ {:4} {:+2} {} ]", pfm2sid::synth::action_to_string(entry, buf),
+    return format_to(ctx.out(), "[ {} {:+2} {} ]", pfm2sid::synth::action_to_string(entry, buf),
                      entry.transpose, static_cast<uint8_t>(entry.waveform));
   }
 };

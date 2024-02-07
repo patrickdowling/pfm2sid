@@ -101,9 +101,9 @@ public:
       : desc_(ParameterDesc::Find(parameter_ref)), ivalue(desc_->default_value)
   {}
   ParameterValue() = delete;
-  //DELETE_COPY_MOVE(ParameterValue);
-  // -> This might be overkill; we want to avoid copies from ::get() type functions, but it does
-  // inhibit keeping parameters in a Patch (which might be copyable).
+  // DELETE_COPY_MOVE(ParameterValue);
+  //  -> This might be overkill; we want to avoid copies from ::get() type functions, but it does
+  //  inhibit keeping parameters in a Patch (which might be copyable).
 
   constexpr const char* name() const { return desc_->name; }
   constexpr auto ref() const { return desc_->parameter; }

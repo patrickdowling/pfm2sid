@@ -65,7 +65,7 @@ static midi::MidiParser serial_midi_parser INCCM;
 static MODE current_mode = MODE::INVALID;
 synth::SystemParameters system_parameters INCCM;
 
-synth::PatchBank current_bank INCCM = synth::PatchBank::default_bank();
+synth::PatchBank current_bank;
 synth::Patch current_patch INCCM;
 
 synth::Engine engine INCCM;
@@ -170,10 +170,11 @@ static void Init()
   midi_serial.Init();
   ui.Init();
 
+  synth::PatchBank::default_bank(current_bank);
   current_patch = current_bank.Load(0);
 
   engine.Init(&current_patch.parameters);
-  sid_synth_.Init(&current_patch.parameters);
+  sid_synth_.Init(&current_patch.parameters, current_patch.wavetables);
 
   sid_synth_editor_.MenuInit();
   sid_synth_editor_.register_listener(&engine);
@@ -184,8 +185,6 @@ static void Init()
   // STM32X_CORE_INIT(F_CPU / kSysTickUpdateHz); -> FreeRTOS timer
   serial_midi_parser.Init({&midi_handler, nullptr, nullptr});
   midi_handler.set_rx_channel(0);
-
-  synth::InitWaveTables();  // TODO
 }
 
 static void RenderSampleBlock()
