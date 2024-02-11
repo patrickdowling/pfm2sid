@@ -10,6 +10,8 @@ TEST(ParametersTest, basics)
   fmt::println("global_parameter_count={}", synth::kNumGlobalParameters);
   fmt::println("voice_parameter_count={}", synth::kNumVoiceParameters);
   fmt::println("lfo_parameter_count={}", synth::kNumLfoParameters);
+
+  fmt::println("sizeof(Parameters)={}", sizeof(synth::Parameters));
 }
 
 static void Print(const synth::ParameterDesc *desc)

@@ -171,7 +171,7 @@ static void Init()
   ui.Init();
 
   synth::PatchBank::default_bank(current_bank);
-  current_patch = current_bank.Load(0);
+  current_bank.Load(0, current_patch);
 
   engine.Init(&current_patch.parameters);
   sid_synth_.Init(&current_patch.parameters, current_patch.wavetables);

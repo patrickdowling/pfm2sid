@@ -1,6 +1,6 @@
 // pfm2sid: PreenFM2 meets SID
 //
-// Copyright (C) 2024 Patrick Dowling (pld@gurkenkiste.com)
+// Copyright (C) 2023-2024 Patrick Dowling (pld@gurkenkiste.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,15 +20,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-#include "synth/patch_bank.h"
+#include "patch.h"
 
 namespace pfm2sid::synth {
 
-static const/*expr*/ Patch default_patch;
+static_assert(Patch::kStorageSize < Patch::kBinaryPatchSize);
 
-/*static*/ void PatchBank::default_bank(PatchBank &patch_bank)
+bool Patch::Save(util::StreamBufferWriter &sbw) const
 {
-  for (size_t i = 0; i < kNumPatchesPerBank; ++i) patch_bank.Save(i, default_patch);
+  sbw.Write(kStorageID);
+  sbw.Write(kVersionID);
+  sbw.Write(name(), kPatchNameLength);
+
+  parameters.Save(sbw);
+  for (const auto &wt : wavetables) wt.Save(sbw);
+
+  sbw.Write(kEndMarker);
+  return !sbw.overflow();
+}
+
+bool Patch::Load(util::StreamBufferReader &sbr)
+{
+  if (kStorageID != sbr.Read<util::FOURCC>()) return false;
+  if (kVersionID != sbr.Read<util::FOURCC>()) return false;
+  sbr.Read(name_, kPatchNameLength);
+
+  parameters.Load(sbr);
+  for (auto &wt : wavetables) wt.Load(sbr);
+
+  if (kEndMarker != sbr.Read<util::FOURCC>()) return false;
+
+  return !sbr.underflow();
 }
 
 }  // namespace pfm2sid::synth

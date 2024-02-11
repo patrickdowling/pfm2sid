@@ -71,7 +71,7 @@ void PatchBrowser::UpdateDisplay() const
     char action = ' ';
     if (i == cursor_.pos()) action = saving_ ? ICON_PATCH_SAVE : ICON_PATCH_LOAD;
     char current = i == current_patch.number() ? '*' : ' ';
-    display.Fmt(l++, "%c%02d%c%-15s", action, i, current, current_bank[i].name());
+    display.Fmt(l++, "%c%02d%c%-15s", action, i, current, current_bank.patch_name(i));
   }
 }
 
@@ -84,7 +84,7 @@ void PatchBrowser::Exit()
 
 void PatchBrowser::Load()
 {
-  current_patch = current_bank[cursor_.pos()];
+  current_bank.Load(cursor_.pos(), current_patch);
   current_patch.set_number(cursor_.pos());
 }
 

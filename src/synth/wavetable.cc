@@ -63,6 +63,29 @@ void InitWaveTables(Patch &patch)
   }
 }
 
+void WaveTable::Save(util::StreamBufferWriter &sbw) const
+{
+  sbw.Write(kStorageID);
+  sbw.Write(enabled_tracks_);
+  for (const auto &e : data_) {
+    sbw.Write(e.action);
+    sbw.Write(e.transpose);
+    sbw.Write(e.waveform);
+  }
+}
+
+bool WaveTable::Load(util::StreamBufferReader &sbr)
+{
+  if (kStorageID != sbr.Read<util::FOURCC>()) return false;
+  sbr.Read(enabled_tracks_);
+  for (auto &e : data_) {
+    sbr.Read(e.action);
+    sbr.Read(e.transpose);
+    sbr.Read(e.waveform);
+  }
+  return true;
+}
+
 // TODO This seems overly complex
 WaveTable::Entry WaveTableScanner::Update()
 {

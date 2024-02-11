@@ -217,6 +217,9 @@ public:
                : nullptr;
   }
 
+  void Save(util::StreamBufferWriter &sbw) const;
+  bool Load(util::StreamBufferReader &sbr);
+
 private:
   using global_parameter_array = std::array<ParameterValue, kNumGlobalParameters>;
   using lfo_parameter_array = std::array<ParameterValue, kNumLfoParameters>;

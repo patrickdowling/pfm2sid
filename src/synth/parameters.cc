@@ -27,6 +27,7 @@
 #include "modulation.h"
 #include "parameter_structs.h"
 #include "ui/status_icons.h"
+#include "util/util_fourcc.h"
 #include "util/util_macros.h"
 #include "wavetable.h"
 
@@ -154,6 +155,44 @@ void Parameters::Reset()
 void SystemParameters::Reset()
 {
   detail::ResetArray(system_parameters_);
+}
+
+static constexpr util::FOURCC kGlobalID = "GLOB"_4CC;
+static constexpr util::FOURCC kLfoID = "LFOo"_4CC;
+static constexpr util::FOURCC kVoiceID = "VOIC"_4CC;
+
+void Parameters::Save(util::StreamBufferWriter& sbw) const
+{
+  sbw.Write(kGlobalID);
+  for (const auto& v : global_parameters_) sbw.Write(v.value());
+
+  for (unsigned i = 0; i < 3; ++i) {
+    sbw.Write(kVoiceID);
+    for (const auto& v : voice_parameters_[i]) sbw.Write(v.value());
+  }
+
+  for (unsigned i = 0; i < kNumLfos; ++i) {
+    sbw.Write(kLfoID);
+    for (const auto& v : lfo_parameters_[i]) sbw.Write(v.value());
+  }
+}
+
+bool Parameters::Load(util::StreamBufferReader& sbr)
+{
+  if (kGlobalID != sbr.Read<util::FOURCC>()) return false;
+  for (auto& v : global_parameters_) v = sbr.Read<parameter_value_type>();
+
+  for (unsigned i = 0; i < 3; ++i) {
+    if (kVoiceID != sbr.Read<util::FOURCC>()) return false;
+    for (auto& v : voice_parameters_[i]) v = sbr.Read<parameter_value_type>();
+  }
+
+  for (unsigned i = 0; i < kNumLfos; ++i) {
+    if (kLfoID != sbr.Read<util::FOURCC>()) return false;
+    for (auto& v : lfo_parameters_[i]) v = sbr.Read<parameter_value_type>();
+  }
+
+  return true;
 }
 
 }  // namespace pfm2sid::synth

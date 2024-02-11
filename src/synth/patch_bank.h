@@ -30,23 +30,37 @@ public:
 
   const char *name() const { return name_; }
 
-  auto &operator[](size_t i) const { return patches_[i]; }
+  const char *patch_name(size_t i) const { return patch_data_[i].name; }
 
-  auto &Load(size_t i) const { return patches_[i]; }
-  auto &Save(size_t i, const Patch &patch)
+  bool Load(size_t i, Patch &patch) const
   {
-    patches_[i] = patch;
-    return patches_[i];
+    util::StreamBufferReader sbr{patch_data(i), Patch::kBinaryPatchSize};
+    return patch.Load(sbr);
   }
 
-  int size() const { return kNumPatchesPerBank; }
+  bool Save(size_t i, const Patch &patch)
+  {
+    util::StreamBufferWriter sbw{patch_data(i), Patch::kBinaryPatchSize};
+    memcpy(patch_data_[i].name, patch.name(), kPatchNameLength);
+    return patch.Save(sbw);
+  }
+
+  constexpr int size() { return patch_data_.size(); }
 
   static void default_bank(PatchBank &patch_bank);
 
 private:
-  char name_[kMaxNameLength] = {0};
+  char name_[kBankNameLength] = {0};
 
-  std::array<Patch, kNumPatchesPerBank> patches_;
+  struct PatchData {
+    char name[kPatchNameLength] = {};
+    uint8_t binary_data[Patch::kBinaryPatchSize];
+  };
+
+  std::array<PatchData, kNumPatchesPerBank> patch_data_;
+
+  auto patch_data(size_t i) -> uint8_t * { return patch_data_[i].binary_data; }
+  auto patch_data(size_t i) const -> const uint8_t * { return patch_data_[i].binary_data; }
 };
 
 }  // namespace pfm2sid::synth

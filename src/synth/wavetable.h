@@ -27,6 +27,7 @@
 #include <cstdint>
 
 #include "sidbits/sidbits.h"
+#include "util/util_stream_buffer.h"
 
 namespace pfm2sid::synth {
 
@@ -43,7 +44,7 @@ class WaveTable {
 public:
   static constexpr size_t kMaxSteps = 32;
 
-  enum ACTION { PLAY, LOOP, END };
+  enum ACTION : uint8_t { PLAY, LOOP, END };
   enum TRACK : unsigned { TRANSPOSE, WAVEFORM };
 
   template <WaveTable::TRACK track>
@@ -54,7 +55,6 @@ public:
 
   struct Entry {
     ACTION action = END;
-
     int16_t transpose = 0;
     sidbits::OSC_WAVE waveform = sidbits::OSC_WAVE::SILENCE;
 
@@ -88,6 +88,12 @@ public:
   {
     return enabled_tracks_ & track_mask<track>();
   }
+
+  static constexpr util::FOURCC kStorageID = "WTBL"_4CC;
+  static constexpr size_t kStorageSize = 4 + sizeof(unsigned) + kMaxSteps * (1 + 2 + 1);
+
+  void Save(util::StreamBufferWriter &sbw) const;
+  bool Load(util::StreamBufferReader &sbr);
 
 private:
   std::array<Entry, kMaxSteps> data_;

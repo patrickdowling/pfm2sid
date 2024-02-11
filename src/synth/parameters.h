@@ -25,6 +25,7 @@
 
 #include "sidbits/sidbits.h"
 #include "synth.h"
+#include "util/util_stream_buffer.h"
 #include "util/util_templates.h"
 
 namespace pfm2sid::synth {

@@ -25,6 +25,8 @@
 
 #include "synth/parameter_structs.h"
 #include "synth/wavetable.h"
+#include "util/util_fourcc.h"
+#include "util/util_stream_buffer.h"
 
 namespace pfm2sid::synth {
 
@@ -33,16 +35,33 @@ class PatchBrowser;
 
 class Patch {
 public:
-  Patch() : name_{"Default"} {}
+  static constexpr util::FOURCC kStorageID = "PTCH"_4CC;
+  static constexpr util::FOURCC kEndMarker = "ENDE"_4CC;
+  static constexpr util::FOURCC kVersionID = "v001"_4CC;
 
-  int number() const { return number_; }
+  static constexpr size_t kBinaryPatchSize = 1024;
+
+  Patch() : name_{"Default"} { InitWaveTables(*this); }
+
+  int number() const { return number_; } // Not persistent
   const char *name() const { return name_; }
 
   Parameters parameters;
   WaveTable wavetables[kNumWaveTables];
 
+  static constexpr size_t kStorageSize =    //
+      4 + 4 + 4 + kPatchNameLength          // header
+      + ((1 + kNumGlobalParameters)         //
+         + (3 * (1 + kNumVoiceParameters))  //
+         + (kNumLfos * (1 + kNumLfoParameters))) *
+            sizeof(parameter_value_type)  //
+      + (kNumWaveTables * WaveTable::kStorageSize);
+
+  bool Save(util::StreamBufferWriter &sbw) const;
+  bool Load(util::StreamBufferReader &sbr);
+
 private:
-  char name_[kMaxNameLength] = {0};
+  char name_[kPatchNameLength] = {0};
   int number_ = 0;
 
   friend class PatchBank;
