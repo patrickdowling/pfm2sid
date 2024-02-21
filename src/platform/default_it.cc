@@ -52,10 +52,12 @@ TRAP_HANDLER(HardFault_Handler)
 TRAP_HANDLER(MemManage_Handler)
 TRAP_HANDLER(BusFault_Handler)
 TRAP_HANDLER(UsageFault_Handler)
-
-EMPTY_HANDLER(SVC_Handler)
 EMPTY_HANDLER(DebugMon_Handler)
+
+#ifndef PFM2SID_USE_FREERTOS
+EMPTY_HANDLER(SVC_Handler)
 EMPTY_HANDLER(PendSV_Handler)
+#endif
 
 TRAP_HANDLER(__cxa_pure_virtual)
 

@@ -27,7 +27,7 @@
 #include <cmath>
 #include <cstdint>
 
-#include "misc/platform.h"
+#include "platform/platform.h"
 
 namespace pfm2sid::synth {
 

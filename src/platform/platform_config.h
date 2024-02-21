@@ -20,14 +20,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-#ifndef PFM2SID_PLATFORM_H_
-#define PFM2SID_PLATFORM_H_
+#ifndef PFM2SID_PLATFORM_CONFIG_H_
+#define PFM2SID_PLATFORM_CONFIG_H_
 
-#define likely(x) __builtin_expect(!!(x), 1)
-#define unlikely(x) __builtin_expect(!!(x), 0)
+#define PFM2SID_OS_NUM_TIMERS 1
+#define PFM2SID_OS_STACK_SIZE 256
 
-#define ENABLE_WCONVERSION() _Pragma("GCC diagnostic warning \"-Wconversion\"")
-
-#define PRINT_F32(x) static_cast<double>(x)
-
+#ifdef __cplusplus
+extern "C" {
 #endif
+
+void vAssertCalled(const char *, unsigned long);
+
+#ifdef __cplusplus
+}
+#endif
+#endif  // PFM2SID_PLATFORM_CONFIG_H_

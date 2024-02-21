@@ -23,10 +23,9 @@
 #include "lfo.h"
 
 #include <algorithm>
-#include <array>
 #include <cmath>
 
-#include "misc/platform.h"
+#include "platform/platform.h"
 #include "synth.h"
 #include "util/util_lut.h"
 

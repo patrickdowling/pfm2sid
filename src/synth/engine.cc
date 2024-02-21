@@ -22,7 +22,7 @@
 //
 #include "engine.h"
 
-#include "misc/platform.h"
+#include "platform/platform.h"
 #include "pfm2sid_stats.h"
 #include "stm32x/stm32x_core.h"
 #include "stm32x/stm32x_debug.h"

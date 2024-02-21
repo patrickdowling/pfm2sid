@@ -26,7 +26,7 @@
 #include <cinttypes>
 
 #include "menu/menu_util.h"
-#include "misc/platform.h"
+#include "platform/platform.h"
 #include "pfm2sid_stats.h"
 #include "sidbits/asid_parser.h"
 #include "sidbits/sidbits.h"

@@ -22,12 +22,10 @@
 //
 #include "sidbits.h"
 
-#include <array>
 #include <cmath>
-#include <utility>
 
 #include "midi/midi_types.h"
-#include "misc/platform.h"
+#include "platform/platform.h"
 #include "util/util_lut.h"
 
 ENABLE_WCONVERSION()

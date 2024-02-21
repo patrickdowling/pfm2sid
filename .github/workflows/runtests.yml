@@ -1,5 +1,9 @@
 name: Run unit tests
-on: [push]
+on: 
+  push:
+    branches:
+      - main
+      - 'wip/**'
 jobs:
   tests:
     runs-on: ubuntu-22.04

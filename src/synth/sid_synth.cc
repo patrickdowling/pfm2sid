@@ -22,7 +22,7 @@
 //
 #include "sid_synth.h"
 
-#include "misc/platform.h"
+#include "platform/platform.h"
 #include "parameter_types.h"
 #include "stm32x/stm32x_debug.h"
 

@@ -1,3 +1,6 @@
 [submodule "stm32x"]
 	path = stm32x
 	url = https://github.com/patrickdowling/stm32x.git
+[submodule "extern/FreeRTOS-Kernel"]
+	path = extern/FreeRTOS-Kernel
+	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
