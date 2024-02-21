@@ -22,8 +22,6 @@
 //
 #include "engine.h"
 
-#include <cmath>
-
 #include "misc/platform.h"
 #include "pfm2sid_stats.h"
 #include "stm32x/stm32x_core.h"

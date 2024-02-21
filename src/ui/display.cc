@@ -21,11 +21,11 @@
 // SOFTWARE.
 //
 #include "display.h"
+#include "stm32x/stm32x_core.h"
 
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
-#include <iterator>
 
 namespace pfm2sid {
 
@@ -36,16 +36,16 @@ void Display::Clear()
   memset(status_bar_, ' ', kNumStatusIcons);
 }
 
+static char fmt_buf[Display::kLineWidth + 1] INCCMZ;
+
 // We don't actually want the \0 in the screen buffer, but do want the convenience of printf.
 // So this ends up being mildly awkward and not exactly efficient...
 void Display::Fmt(uint8_t line, const char *fmt, ...)
 {
-  static char fmt_buf[kLineWidth + 1] = {0};
-
   va_list args;
   va_start(args, fmt);
   auto n = vsnprintf(fmt_buf, sizeof(fmt_buf), fmt, args);
-  // if (n < 0) {}
+  if (n < 0) n = 0; // ignore encoding errors
   auto *buf = line_buffer_ + (line * kLineWidth);
   if (n < kLineWidth) {
     memcpy(buf, fmt_buf, n);
