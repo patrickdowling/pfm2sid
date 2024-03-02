@@ -63,7 +63,7 @@ PROJECT_DEFINES += MIDI_PARSER_RX_BUFFER_SIZE=256
 BINFILES = $(notdir $(wildcard $(PROJECT_RESOURCE_DIR)/*.dmp))
 EXTRA_OBJS += $(patsubst %,$(OBJDIR)%,$(BINFILES:.dmp=.o))
 
-include stm32x/makefile
+include stm32x/stm32x.mk
 
 # This step is somewhat convoluted to avoid endless variable names since the whole input path is used.
 # Also we want them in a readonly section, not RAM
