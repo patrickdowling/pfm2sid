@@ -178,9 +178,7 @@ static void Init()
   sid_synth_editor_.register_listener(&midi_handler);
 
   core_timer.Start();
-#ifndef PFM2SID_USE_FREERTOS
-  STM32X_CORE_INIT(F_CPU / kSysTickUpdateHz);
-#endif
+  // STM32X_CORE_INIT(F_CPU / kSysTickUpdateHz); -> FreeRTOS timer
   serial_midi_parser.Init({&midi_handler, nullptr, nullptr});
   midi_handler.set_rx_channel(0);
 
@@ -210,14 +208,9 @@ static void RenderSampleBlock()
   }
 }
 
-#ifdef PFM2SID_USE_FREERTOS
 extern "C" void Run(void *pvParameters)
 {
   auto mode = static_cast<pfm2sid::MODE>((uint32_t)pvParameters);
-#else
-void Run(pfm2sid::MODE mode)
-{
-#endif
   using namespace pfm2sid;
 
   set_mode(mode);
@@ -277,13 +270,9 @@ extern "C" void PFM2SID_CORE_TIMER_HANDLER()
   if (midi_rx) { serial_midi_rx.Write(midi_rx.value()); }
 }
 
-#ifdef PFM2SID_USE_FREERTOS
 // Use a timer for the UI/display tick. This could also hook the vApplicationTickHook
 // (it's perhaps not quite lightweight enough)
 extern "C" void vTickTimerCallback(TimerHandle_t /* xTimer */)
-#else
-extern "C" void SysTick_Handler()
-#endif
 {
   STM32X_CORE_TICK();
   using namespace pfm2sid;
@@ -298,7 +287,6 @@ int main()
   STM32X_DEBUG_INIT();
   pfm2sid::Init();
 
-#ifdef PFM2SID_USE_FREERTOS
   xTimerHandles[0] = xTimerCreateStatic("UI", pdMS_TO_TICKS(1), pdTRUE, (void *)0,
                                         vTickTimerCallback, &xTimerBuffers[0]);
   configASSERT(nullptr != xTimerHandles[0]);
@@ -311,7 +299,4 @@ int main()
 
   vTaskStartScheduler();
   for (;;) {}
-#else
-  pfm2sid::Run(pfm2sid::MODE::SID_SYNTH);
-#endif
 }

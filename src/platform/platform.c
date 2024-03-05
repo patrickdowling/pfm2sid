@@ -1,7 +1,5 @@
 #include "platform.h"
 
-#ifdef PFM2SID_USE_FREERTOS
-
 StaticTimer_t xTimerBuffers[PFM2SID_OS_NUM_TIMERS] __attribute__((section(".ccmz")));
 TimerHandle_t xTimerHandles[PFM2SID_OS_NUM_TIMERS] __attribute__((section(".ccmz")));
 
@@ -44,5 +42,3 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
   (void)xTask;
   (void)pcTaskName;
 }
-
-#endif

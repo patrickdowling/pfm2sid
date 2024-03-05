@@ -32,7 +32,6 @@
 
 #define PRINT_F32(x) static_cast<double>(x)
 
-#ifdef PFM2SID_USE_FREERTOS
 #include "FreeRTOS.h"
 #include "task.h"
 #include "timers.h"
@@ -43,6 +42,5 @@ extern TimerHandle_t xTimerHandles[PFM2SID_OS_NUM_TIMERS];
 extern StaticTask_t xTaskBuffer;
 extern StackType_t xTaskStack[PFM2SID_OS_STACK_SIZE];
 extern TaskHandle_t xMainTaskHandle;
-#endif
 
 #endif

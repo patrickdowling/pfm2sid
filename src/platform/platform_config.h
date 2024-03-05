@@ -35,4 +35,5 @@ void vAssertCalled(const char *, unsigned long);
 #ifdef __cplusplus
 }
 #endif
+
 #endif  // PFM2SID_PLATFORM_CONFIG_H_
