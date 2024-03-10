@@ -83,14 +83,14 @@ public:
       auto pct = sid_stream_.percent();
       display.Fmt(2, "[%.*s]%5.1f%%", 12, progress + 12 - (int)(pct / 100.f * 12.f), pct);
       */
-      display.Fmt(2, "%20.2f", PRINT_F32(CoreTimer::timer_to_ms(delta_t_)));
+      display.Fmt(2, "%20.2f", PRINT_F32(HiresTimer::timer_to_ms(delta_t_)));
       display.Fmt(3, "%20" PRIu32, stats::render_block_cycles.value_in_us());
     }
   }
 
   auto ParseSysex(const uint8_t *data, size_t len)
   {
-    auto now = CoreTimer::now();
+    auto now = HiresTimer::now();
     delta_t_ = now - last_;
     last_ = now;
 

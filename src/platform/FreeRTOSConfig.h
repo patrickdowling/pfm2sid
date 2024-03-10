@@ -6,14 +6,14 @@ your application. */
 #include "platform_config.h"
 
 #define configUSE_PREEMPTION                    1
-#define configUSE_PORT_OPTIMISED_TASK_SELECTION 0
+#define configUSE_PORT_OPTIMISED_TASK_SELECTION 1
 #define configUSE_TICKLESS_IDLE                 0
 #define configCPU_CLOCK_HZ                      F_CPU
 //#define configSYSTICK_CLOCK_HZ                  1000000
 #define configTICK_RATE_HZ                      1000
 #define configMAX_PRIORITIES                    5
 #define configMINIMAL_STACK_SIZE                128
-#define configMAX_TASK_NAME_LEN                 16
+#define configMAX_TASK_NAME_LEN                 8
 #define configUSE_16_BIT_TICKS                  0
 #define configIDLE_SHOULD_YIELD                 1
 #define configUSE_TASK_NOTIFICATIONS            1
@@ -67,13 +67,37 @@ your application. */
 #define configTIMER_QUEUE_LENGTH                10
 #define configTIMER_TASK_STACK_DEPTH            configMINIMAL_STACK_SIZE
 
-/* Interrupt nesting behaviour configuration. */
-#define configKERNEL_INTERRUPT_PRIORITY         (0x0f << 4)
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY    (5 << 4)
-#define configMAX_API_CALL_INTERRUPT_PRIORITY   (5 << 4)
+/* Cortex-M specific definitions. */
+#ifdef __NVIC_PRIO_BITS
+	/* __BVIC_PRIO_BITS will be specified when CMSIS is being used. */
+	#define configPRIO_BITS       		__NVIC_PRIO_BITS
+#else
+	#define configPRIO_BITS       		4        /* 15 priority levels */
+#endif
+
+/* The lowest interrupt priority that can be used in a call to a "set priority"
+function. */
+#define configLIBRARY_LOWEST_INTERRUPT_PRIORITY			0xf
+
+/* The highest interrupt priority that can be used by any interrupt service
+routine that makes calls to interrupt safe FreeRTOS API functions.  DO NOT CALL
+INTERRUPT SAFE FREERTOS API FUNCTIONS FROM ANY INTERRUPT THAT HAS A HIGHER
+PRIORITY THAN THIS! (higher priorities are lower numeric values. */
+#define configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY	5
+
+/* Interrupt priorities used by the kernel port layer itself.  These are generic
+to all Cortex-M ports, and do not rely on any particular library functions. */
+#define configKERNEL_INTERRUPT_PRIORITY 		( configLIBRARY_LOWEST_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )
+/* !!!! configMAX_SYSCALL_INTERRUPT_PRIORITY must not be set to zero !!!!
+See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY 	( configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )
 
 /* Define to trap errors during development. */
-#define configASSERT( x ) if( ( x ) == 0 ) vAssertCalled( __FILE__, __LINE__ )
+#ifdef PFM2SID_ASSERT_ENABLE
+#define configASSERT( x ) do { if( !( x ) ) vAssertCalled( __FILE__, __LINE__ ); } while (0)
+#else
+#define configASSERT( x )  do { } while (0)
+#endif
 
 /* FreeRTOS MPU specific definitions. */
 #define configINCLUDE_APPLICATION_DEFINED_PRIVILEGED_FUNCTIONS 0
@@ -121,9 +145,9 @@ your application. */
 
 
 #if configGENERATE_RUN_TIME_STATS
-extern uint32_t highResolutionTimerTicks();
+extern uint32_t core_timer_ticks;
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() ( {} )
-#define portGET_RUN_TIME_COUNTER_VALUE() highResolutionTimerTicks()
+#define portGET_RUN_TIME_COUNTER_VALUE() core_timer_ticks
 #endif // configGENERATE_RUN_TIME_STATS
 
 #endif /* FREERTOS_CONFIG_H */

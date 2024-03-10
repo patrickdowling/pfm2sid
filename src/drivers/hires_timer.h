@@ -1,6 +1,6 @@
 // pfm2sid: PreenFM2 meets SID
 //
-// Copyright (C) 2024 Patrick Dowling (pld@gurkenkiste.com)
+// Copyright (C) 2023-2024 Patrick Dowling (pld@gurkenkiste.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,22 +20,38 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-#include "ui/menu.h"
+#ifndef PFM2SID_HIRES_TIMER_H_
+#define PFM2SID_HIRES_TIMER_H_
 
-#include "ui/display.h"
+#include <cinttypes>
+
+#include "stm32x/stm32x_core.h"
+#include "stm32x/stm32x_debug.h"
 
 namespace pfm2sid {
 
-void Menu::HandleMenuEvent(MENU_EVENT menu_event)
-{
-  switch (menu_event) {
-    case MENU_EVENT::ENTER:
-      display.EnableStatusBar(enable_status_bar());
-      display.Clear();
-      MenuEnter();
-      break;
-    case MENU_EVENT::EXIT: MenuExit(); break;
+// Extra "precision" timebase that's independent of SysTick (which might be running at 1KHz).
+class HiresTimer {
+public:
+  static inline uint32_t now() { return DWT->CYCCNT; }
+
+  static constexpr uint32_t kCyclesPerMicro = F_CPU / 1'000'000UL;
+
+  static constexpr uint32_t us_to_timer(uint32_t us) { return us * kCyclesPerMicro; }
+  static constexpr uint32_t ms_to_timer(uint32_t ms) { return ms * 1000UL * kCyclesPerMicro; }
+
+  static constexpr float timer_to_ms(uint32_t cycles)
+  {
+    return static_cast<float>(cycles) * (1000.f / static_cast<float>(F_CPU));
   }
-}
+
+  static inline void delay_us(uint32_t us)
+  {
+    auto start = now();
+    while ((now() - start) < us_to_timer(us)) {}
+  }
+};
 
 }  // namespace pfm2sid
+
+#endif  // PFM2SID_HIRES_TIMER_H_

@@ -4,7 +4,8 @@ inc = [
   '../src',
   '../resources',
   '../stm32x/include',
-  '../extern'
+  '../extern',
+  '../src/platform',
   ]
 
 test_src = [
@@ -45,7 +46,7 @@ fmt_dep = dependency('fmt', required: true)
 
 pfm2sid_test = executable(
   'pfm2sid_test',
-  cpp_args : [ '-DMIDI_TRACE_FMT=fmt::println' ],
+  cpp_args : [ '-DMIDI_TRACE_FMT=fmt::println', '-DPFM2SID_TEST' ],
   sources : [ test_src, src, extern_src ],
   include_directories : inc,
   dependencies : [ gtest_dep, fmt_dep ])

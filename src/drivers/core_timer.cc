@@ -22,6 +22,8 @@
 //
 #include "core_timer.h"
 
+#include "platform/platform.h"
+
 namespace pfm2sid {
 
 void CoreTimer::Init(uint32_t period)
@@ -37,13 +39,18 @@ void CoreTimer::Init(uint32_t period)
   TIM_InternalClockConfig(TIM1);
   TIM_TimeBaseInit(TIM1, &timer_init);
 
-  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
-  NVIC_InitTypeDef timer_interrupt;
-  timer_interrupt.NVIC_IRQChannel = TIM1_UP_TIM10_IRQn;
-  timer_interrupt.NVIC_IRQChannelPreemptionPriority = 0;
-  timer_interrupt.NVIC_IRQChannelSubPriority = 0;
-  timer_interrupt.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&timer_interrupt);
+  NVIC_InitTypeDef nvic_init;
+  nvic_init.NVIC_IRQChannel = PFM2SID_CORE_TIMER_IRQn;
+  nvic_init.NVIC_IRQChannelPreemptionPriority = PFM2SID_CORE_TIMER_IRQ_PRIORITY;
+  nvic_init.NVIC_IRQChannelSubPriority = 0;
+  nvic_init.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&nvic_init);
+
+  nvic_init.NVIC_IRQChannel = PFM2SID_RENDER_IRQn;
+  nvic_init.NVIC_IRQChannelPreemptionPriority = PFM2SID_RENDER_IRQ_PRIORITY;
+  nvic_init.NVIC_IRQChannelSubPriority = 0;
+  nvic_init.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&nvic_init);
 }
 
 void CoreTimer::Start()

@@ -24,7 +24,7 @@
 
 namespace pfm2sid::synth {
 
-static const/*expr*/ Patch default_patch;
+static const /*expr*/ Patch default_patch;
 
 /*static*/ void PatchBank::default_bank(PatchBank &patch_bank)
 {

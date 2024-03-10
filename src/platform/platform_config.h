@@ -23,14 +23,34 @@
 #ifndef PFM2SID_PLATFORM_CONFIG_H_
 #define PFM2SID_PLATFORM_CONFIG_H_
 
-#define PFM2SID_OS_NUM_TIMERS 1
 #define PFM2SID_OS_STACK_SIZE 256
+
+enum PFM2SID_TIMER_ID { TIMER_UI_TICK, TIMER_COUNT };
+enum PFM2SID_TASK_ID { TASK_MAIN, TASK_RENDER, TASK_USBH, TASK_COUNT };
+
+#define TASK_MAIN_TICK_NOTIFY_IDX 0
+#define TASK_RENDER_IRQ_NOTIFY_IDX 0
+
+// Assuming NVIC_PriorityGroup_4
+#define PFM2SID_CORE_TIMER_IRQ_PRIORITY 0
+#define PFM2SID_USB_HS_IRQ_PRIORITY 2
+#define PFM2SID_RENDER_IRQ_PRIORITY configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY
+
+#define PFM2SID_RENDER_IRQn EXTI0_IRQn
+#define PFM2SID_RENDER_IRQ_HANDLER EXTI0_IRQHandler
+
+#define PFM2SID_CORE_TIMER_IRQn TIM1_UP_TIM10_IRQn
+#define PFM2SID_CORE_TIMER_IRQ_HANDLER TIM1_UP_TIM10_IRQHandler
+
+// #define PF2SID_USB_FS_ENABLE
+
+#define PFM2SID_USBH_QUEUE_LENGTH 8
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void vAssertCalled(const char *, unsigned long);
+void vAssertCalled(const char* const, unsigned long);
 
 #ifdef __cplusplus
 }

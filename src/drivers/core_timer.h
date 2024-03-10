@@ -30,10 +30,7 @@
 
 namespace pfm2sid {
 
-#define PFM2SID_CORE_TIMER_HANDLER TIM1_UP_TIM10_IRQHandler
-
-// This handles both the system update timer/interrupt that drives the DAC, and adds an extra
-// "precision" timer that's independent of SysTick (which might be running at 1KHz).
+// This handles both the core timer/interrupt that drives the DAC (and perhaps other things).
 class CoreTimer {
 public:
   void Init(uint32_t period);
@@ -47,24 +44,6 @@ public:
     } else {
       return false;
     }
-  }
-
-  static inline uint32_t now() { return DWT->CYCCNT; }
-
-  static constexpr uint32_t kCyclesPerMicro = F_CPU / 1'000'000UL;
-
-  static constexpr uint32_t us_to_timer(uint32_t us) { return us * kCyclesPerMicro; }
-  static constexpr uint32_t ms_to_timer(uint32_t ms) { return ms * 1000UL * kCyclesPerMicro; }
-
-  static constexpr float timer_to_ms(uint32_t cycles)
-  {
-    return static_cast<float>(cycles) * (1000.f / static_cast<float>(F_CPU));
-  }
-
-  static inline void delay_us(uint32_t us)
-  {
-    auto start = now();
-    while ((now() - start) < us_to_timer(us)) {}
   }
 };
 

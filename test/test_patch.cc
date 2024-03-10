@@ -1,8 +1,8 @@
 #include "fmt/core.h"
 #include "gtest/gtest.h"
+#include "pfm2sid_test.h"
 #include "synth/patch.h"
 #include "synth/patch_bank.h"
-#include "pfm2sid_test.h"
 
 namespace pfm2sid::test {
 

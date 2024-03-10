@@ -25,8 +25,6 @@
 // -----------------------------------------------------------------------------
 // Default interrupt handlers.
 
-#include <stdint.h>
-
 #define EMPTY_HANDLER(x) \
   void x() {}
 
@@ -38,14 +36,6 @@
 
 extern "C" {
 
-#ifdef USE_FULL_ASSERT
-void assert_failed(uint8_t *file, uint32_t line)
-{
-  while (1)
-    ;
-}
-#endif
-
 EMPTY_HANDLER(NMI_Handler)
 
 TRAP_HANDLER(HardFault_Handler)
@@ -54,7 +44,7 @@ TRAP_HANDLER(BusFault_Handler)
 TRAP_HANDLER(UsageFault_Handler)
 EMPTY_HANDLER(DebugMon_Handler)
 
-#if 0 // FreeRTOS
+#if 0  // FreeRTOS
 EMPTY_HANDLER(SVC_Handler)
 EMPTY_HANDLER(PendSV_Handler)
 #endif

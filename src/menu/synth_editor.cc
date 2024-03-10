@@ -125,7 +125,7 @@ void SIDSynthEditor::HandleEvent(const Event &event)
     case EVENT_BUTTON_LONG_PRESS:
       switch (event.control) {
         case CONTROL::SWITCH6: break;
-        case CONTROL::SWITCH7: ui.SetMenu(&patch_browser);
+        case CONTROL::SWITCH7: ui.SetMenu(&patch_browser); break;
         default: break;
       }
     case EVENT_BUTTON_RELEASE: break;
@@ -180,13 +180,15 @@ void SIDSynthEditor::UpdateDisplay() const
                 blk_max);
     display.Fmt(2, "sid  %4" PRIu32 " %4" PRIu32, stats::sid_clock_cycles.value_in_us(),
                 stats::sid_clock_cycles.max_in_us());
-    // display.Fmt(3, "%.3f", sid_synth_.bend());
+    display.Fmt(3, "ui   %4" PRIu32 " %4" PRIu32, stats::ui_tick_cycles.value_in_us(),
+                stats::ui_tick_cycles.max_in_us());
     return;
   }
+
   {
     const auto &page_def = editor_page_defs[util::enum_to_i(editor_page_)];
 
-    display.Fmt(0, "%02d %-12s%d", current_patch.number(), current_patch.name(), 1);
+    display.Fmt(0, "%c%02d %-12s", ICON_VOICE_ACTIVE, current_patch.number(), current_patch.name());
 
     char buf[20] = {0};
     switch (page_def.parameter_type) {

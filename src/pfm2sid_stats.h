@@ -30,6 +30,7 @@
 namespace pfm2sid::stats {
 extern stm32x::AveragedCycles render_block_cycles;
 extern stm32x::AveragedCycles sid_clock_cycles;
+extern stm32x::AveragedCycles ui_tick_cycles;
 
 extern unsigned ui_event_counter;
 }  // namespace pfm2sid::stats

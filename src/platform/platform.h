@@ -32,15 +32,28 @@
 
 #define PRINT_F32(x) static_cast<double>(x)
 
+#ifndef PFM2SID_TEST
+
 #include "FreeRTOS.h"
+#include "queue.h"
 #include "task.h"
 #include "timers.h"
 
-extern StaticTimer_t xTimerBuffers[PFM2SID_OS_NUM_TIMERS];
-extern TimerHandle_t xTimerHandles[PFM2SID_OS_NUM_TIMERS];
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-extern StaticTask_t xTaskBuffer;
-extern StackType_t xTaskStack[PFM2SID_OS_STACK_SIZE];
-extern TaskHandle_t xMainTaskHandle;
+extern TimerHandle_t xTimerHandles[TIMER_COUNT];
+extern TaskHandle_t xTaskHandles[TASK_COUNT];
+
+TaskHandle_t TaskCreate(enum PFM2SID_TASK_ID task, TaskFunction_t pxTaskCode, void *pvParameters);
+TimerHandle_t TimerCreate(enum PFM2SID_TIMER_ID timer, TickType_t xTimerPeriod,
+                          TimerCallbackFunction_t pxCallbackFunction);
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
+
+#endif // PFM2SID_TEST
 
 #endif

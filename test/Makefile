@@ -8,6 +8,10 @@ build:
 test:
 	@ninja -C $(BUILD_DIR) test
 
+.PHONY: runtests
+runtests: test
+	./build/pfm2sid_test
+
 .PHONY: wrap
 wrap:
 	mkdir -p ./subprojects

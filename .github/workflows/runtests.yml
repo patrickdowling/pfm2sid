@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - main
-      - 'wip/**'
+      - 'dev/**'
 jobs:
   tests:
     runs-on: ubuntu-22.04

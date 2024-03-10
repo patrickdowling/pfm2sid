@@ -1,4 +1,4 @@
-// Copyright 2023 Patrick Dowling
+// Copyright 2024 Patrick Dowling
 //
 // Author: Patrick Dowling (pld@gurkenkiste.com)
 //
@@ -48,8 +48,8 @@ public:
   using HC165_SHLD = stm32x::GPIO_OUT<stm32x::GPIO_PORT_A, 6, stm32x::GPIO_SPEED::MEDIUM, stm32x::GPIO_OTYPE::PP, stm32x::GPIO_PUPD::NONE, false>;
   using HC165_DATA = stm32x::GPIO_IN<stm32x::GPIO_PORT_A, 7, stm32x::GPIO_PUPD::NONE, false>;
   using HC165_CLK = stm32x::GPIO_OUT<stm32x::GPIO_PORT_A, 8, stm32x::GPIO_SPEED::MEDIUM, stm32x::GPIO_OTYPE::PP, stm32x::GPIO_PUPD::NONE, false>;
-  using USB_OTG_FS_DM = stm32x::GPIO_AF<stm32x::GPIO_PORT_A, 11, stm32x::GPIO_SPEED::MEDIUM, stm32x::GPIO_OTYPE::PP, stm32x::GPIO_PUPD::NONE, 1/*GPIO_AF10_OTG_FS*/, false>;
-  using USB_OTG_FS_DP = stm32x::GPIO_AF<stm32x::GPIO_PORT_A, 12, stm32x::GPIO_SPEED::MEDIUM, stm32x::GPIO_OTYPE::PP, stm32x::GPIO_PUPD::NONE, 1/*GPIO_AF10_OTG_FS*/, false>;
+  using USB_OTG_FS_DM = stm32x::GPIO_AF<stm32x::GPIO_PORT_A, 11, stm32x::GPIO_SPEED::MEDIUM, stm32x::GPIO_OTYPE::PP, stm32x::GPIO_PUPD::NONE, 10/*GPIO_AF10_OTG_FS*/, false>;
+  using USB_OTG_FS_DP = stm32x::GPIO_AF<stm32x::GPIO_PORT_A, 12, stm32x::GPIO_SPEED::MEDIUM, stm32x::GPIO_OTYPE::PP, stm32x::GPIO_PUPD::NONE, 10/*GPIO_AF10_OTG_FS*/, false>;
   using SPI1_SCK = stm32x::GPIO_AF<stm32x::GPIO_PORT_B, 3, stm32x::GPIO_SPEED::FAST, stm32x::GPIO_OTYPE::PP, stm32x::GPIO_PUPD::NONE, 5/*GPIO_AF5_SPI1*/, false>;
   using DAC_R_CS = stm32x::GPIO_OUT<stm32x::GPIO_PORT_B, 4, stm32x::GPIO_SPEED::FAST, stm32x::GPIO_OTYPE::PP, stm32x::GPIO_PUPD::NONE, false>;
   using SPI1_MOSI = stm32x::GPIO_AF<stm32x::GPIO_PORT_B, 5, stm32x::GPIO_SPEED::FAST, stm32x::GPIO_OTYPE::PP, stm32x::GPIO_PUPD::NONE, 5/*GPIO_AF5_SPI1*/, false>;
@@ -57,8 +57,8 @@ public:
   using DAC_L_CS = stm32x::GPIO_OUT<stm32x::GPIO_PORT_B, 9, stm32x::GPIO_SPEED::FAST, stm32x::GPIO_OTYPE::PP, stm32x::GPIO_PUPD::NONE, false>;
   using MIDI_TX = stm32x::GPIO_AF<stm32x::GPIO_PORT_B, 10, stm32x::GPIO_SPEED::LOW, stm32x::GPIO_OTYPE::PP, stm32x::GPIO_PUPD::PULLUP, 7/*GPIO_AF7_USART3*/, false>;
   using MIDI_RX = stm32x::GPIO_AF<stm32x::GPIO_PORT_B, 11, stm32x::GPIO_SPEED::LOW, stm32x::GPIO_OTYPE::PP, stm32x::GPIO_PUPD::NONE, 7/*GPIO_AF7_USART3*/, false>;
-  using USB_OTG_HS_DM = stm32x::GPIO_AF<stm32x::GPIO_PORT_B, 14, stm32x::GPIO_SPEED::MEDIUM, stm32x::GPIO_OTYPE::PP, stm32x::GPIO_PUPD::NONE, 1/*GPIO_AF12_OTG_HS_FS*/, false>;
-  using USB_OTG_HS_DP = stm32x::GPIO_AF<stm32x::GPIO_PORT_B, 15, stm32x::GPIO_SPEED::MEDIUM, stm32x::GPIO_OTYPE::PP, stm32x::GPIO_PUPD::NONE, 1/*GPIO_AF12_OTG_HS_FS*/, false>;
+  using USB_OTG_HS_DM = stm32x::GPIO_AF<stm32x::GPIO_PORT_B, 14, stm32x::GPIO_SPEED::FASTEST, stm32x::GPIO_OTYPE::PP, stm32x::GPIO_PUPD::NONE, 12/*GPIO_AF12_OTG_HS_FS*/, false>;
+  using USB_OTG_HS_DP = stm32x::GPIO_AF<stm32x::GPIO_PORT_B, 15, stm32x::GPIO_SPEED::FASTEST, stm32x::GPIO_OTYPE::PP, stm32x::GPIO_PUPD::NONE, 12/*GPIO_AF12_OTG_HS_FS*/, false>;
   using AIN1 = stm32x::GPIO_AN<stm32x::GPIO_PORT_C, 0, false>;
   using AIN2 = stm32x::GPIO_AN<stm32x::GPIO_PORT_C, 1, false>;
   using AIN3 = stm32x::GPIO_AN<stm32x::GPIO_PORT_C, 2, false>;

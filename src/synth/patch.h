@@ -43,7 +43,7 @@ public:
 
   Patch() : name_{"Default"} { InitWaveTables(*this); }
 
-  int number() const { return number_; } // Not persistent
+  int number() const { return number_; }  // Not persistent
   const char *name() const { return name_; }
 
   Parameters parameters;

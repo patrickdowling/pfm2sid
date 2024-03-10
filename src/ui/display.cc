@@ -21,11 +21,12 @@
 // SOFTWARE.
 //
 #include "display.h"
-#include "stm32x/stm32x_core.h"
 
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
+
+#include "stm32x/stm32x_core.h"
 
 namespace pfm2sid {
 
@@ -45,7 +46,7 @@ void Display::Fmt(uint8_t line, const char *fmt, ...)
   va_list args;
   va_start(args, fmt);
   auto n = vsnprintf(fmt_buf, sizeof(fmt_buf), fmt, args);
-  if (n < 0) n = 0; // ignore encoding errors
+  if (n < 0) n = 0;  // ignore encoding errors
   auto *buf = line_buffer_ + (line * kLineWidth);
   if (n < kLineWidth) {
     memcpy(buf, fmt_buf, n);
@@ -83,7 +84,7 @@ void Display::Update()
   }
 }
 
-static constexpr uint8_t kCharsPerTick = 1;  // ca 100us
+static constexpr uint8_t kCharsPerTick = 4;  // ca 100us per char?
 
 void Display::Tick()
 {

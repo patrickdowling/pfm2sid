@@ -20,22 +20,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-#include "ui/menu.h"
+#include <cstdio>
 
-#include "ui/display.h"
+#include "drivers/lcd.h"
+#include "platform.h"
 
-namespace pfm2sid {
+extern "C" void assert_failed(const char *const file, unsigned long line)
+    __attribute__((weak, alias("vAssertCalled")));
 
-void Menu::HandleMenuEvent(MENU_EVENT menu_event)
+static char assert_buf[21];
+
+extern "C" void vAssertCalled(const char *const file, unsigned long line)
 {
-  switch (menu_event) {
-    case MENU_EVENT::ENTER:
-      display.EnableStatusBar(enable_status_bar());
-      display.Clear();
-      MenuEnter();
-      break;
-    case MENU_EVENT::EXIT: MenuExit(); break;
-  }
-}
+  taskDISABLE_INTERRUPTS();
 
-}  // namespace pfm2sid
+  auto len = strlen(file);
+  snprintf(assert_buf, sizeof(assert_buf), "%-20s", len > 20 ? file + (len - 20) : file);
+  pfm2sid::lcd.MoveCursor(0, 0);
+  pfm2sid::lcd.Print(assert_buf);
+
+  snprintf(assert_buf, sizeof(assert_buf), "line %lu", line);
+  pfm2sid::lcd.MoveCursor(1, 0);
+  pfm2sid::lcd.Print(assert_buf);
+
+  for (;;) {}
+}

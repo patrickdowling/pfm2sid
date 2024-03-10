@@ -24,7 +24,7 @@
 
 #include <algorithm>
 
-#include "core_timer.h"
+#include "hires_timer.h"
 #include "pfm2sid_gpio.h"
 #include "stm32x/stm32x_gpio_utils.h"
 
@@ -70,10 +70,10 @@ using LCD_DATA_PINS = stm32x::PinGroup<GPIO::LCD_D0, GPIO::LCD_D1, GPIO::LCD_D2,
 static void WriteNibbleImmediate(uint8_t value)
 {
   LCD_DATA_PINS::Set(value);
-  CoreTimer::delay_us(1);
+  HiresTimer::delay_us(1);
 
   LCD_E::Set();
-  CoreTimer::delay_us(1);
+  HiresTimer::delay_us(1);
   LCD_E::Reset();
 }
 
@@ -82,7 +82,7 @@ static void WriteCommandImmediate(uint8_t cmd, uint16_t delay_us = kDelayAfterWr
   LCD_RS::Reset();
   WriteNibbleImmediate(cmd >> 4);
   WriteNibbleImmediate(cmd);
-  CoreTimer::delay_us(delay_us);
+  HiresTimer::delay_us(delay_us);
 }
 
 static void WriteDataImmediate(uint8_t data)
@@ -90,7 +90,7 @@ static void WriteDataImmediate(uint8_t data)
   LCD_RS::Set();
   WriteNibbleImmediate(data >> 4);
   WriteNibbleImmediate(data);
-  CoreTimer::delay_us(kDelayAfterWrite);
+  HiresTimer::delay_us(kDelayAfterWrite);
 }
 
 void Lcd::Init()
@@ -99,7 +99,7 @@ void Lcd::Init()
   LCD_E::Init();
   LCD_DATA_PINS::Init();
 
-  CoreTimer::delay_us(50 * 1000);
+  HiresTimer::delay_us(50 * 1000);
 
   LCD_RS::Reset();
   LCD_E::Reset();
@@ -107,10 +107,10 @@ void Lcd::Init()
 
   for (int i = 0; i < 3; ++i) {
     WriteNibbleImmediate((LCD_FUNCTION_SET | LCD_8BIT) >> 4);
-    CoreTimer::delay_us(2 * 1000);
+    HiresTimer::delay_us(2 * 1000);
   }
   WriteNibbleImmediate((LCD_FUNCTION_SET | LCD_4BIT) >> 4);
-  CoreTimer::delay_us(2 * 1000);
+  HiresTimer::delay_us(2 * 1000);
 
   WriteCommandImmediate(LCD_FUNCTION_SET | LCD_4BIT | LCD_2_LINE | LCD_SMALL_FONT);
   WriteCommandImmediate(LCD_DISPLAY_STATUS | LCD_DISPLAY_ON | LCD_CURSOR_OFF | LCD_BLINKING_OFF);

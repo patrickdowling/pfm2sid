@@ -1,4 +1,4 @@
-TOOLCHAIN_PATH ?= ~/dev/toolchain/arm-gnu-toolchain-12.3.rel1-darwin-x86_64-arm-none-eabi/
+TOOLCHAIN_PATH ?= ~/dev/toolchain/arm-gnu-toolchain-12.3.rel1-darwin-x86_64-arm-none-eabi/bin
 
 ###
 ## Project config
@@ -19,8 +19,8 @@ PROJECT_DEFINES += PFM2SID_DEBUG_ENABLE
 PROJECT_LINKER_FLAGS += -u _printf_float
 #DISABLE_WDOUBLE_PROMOTION := TRUE
 
+# parameter passing for argument of type ... changed in GCC 7.1
 OPTIONAL_C_FLAGS += -Wno-psabi
-OPTIONAL_C_FLAGS += -Wno-duplicated-branches # FreeRTOS
 
 # PreenF405
 RAM_SIZE     = 128K
@@ -49,6 +49,30 @@ HSE_VALUE = 12000000UL
 PROJECT_IOC_FILE = ./stm32/preenF405.ioc
 PINOUT_OPTIONS = --typedef --clocks=manual
 
+###
+## External source
+#
+
+# We want special flags only for these .c files so we can't just add the SRC_DIRS as per usual
+# \sa after include stm32x/makefile
+
+# FreeRTOS
+PROJECT_DEFINES += PFM2SID_USE_FREERTOS
+PROJECT_DEFINES += PFM2SID_ASSERT_ENABLE
+
+FREERTOS_SRC_DIR := ./extern/FreeRTOS-Kernel
+FREERTOS_SRC_DIRS = $(FREERTOS_SRC_DIR) $(FREERTOS_SRC_DIR)/portable/GCC/ARM_CM4F
+
+FREERTOS_C_FILES = $(notdir $(wildcard $(patsubst %,%/*.c,$(FREERTOS_SRC_DIRS))))
+FREERTOS_OBJS = $(patsubst %,$(OBJDIR)/%,$(FREERTOS_C_FILES:.c=.o))
+
+EXTRA_OBJS += $(FREERTOS_OBJS)
+VPATH += $(FREERTOS_SRC_DIRS)
+
+PROJECT_INCLUDE_DIRS += $(FREERTOS_SRC_DIR)/include \
+			$(FREERTOS_SRC_DIR)/portable \
+			$(FREERTOS_SRC_DIR)/portable/GCC/ARM_CM4F \
+			./src/platform
 # reSID as external resource
 RESID_SRC_DIR := ./extern/reSID/src
 PROJECT_INCLUDE_DIRS += $(RESID_SRC_DIR)
@@ -61,24 +85,18 @@ PROJECT_DEFINES += RESID_RAW_OUTPUT
 
 PROJECT_DEFINES += MIDI_PARSER_RX_BUFFER_SIZE=256
 
-# FreeRTOS
-FREERTOS_SRC_DIR := ./extern/FreeRTOS-Kernel
-PROJECT_INCLUDE_DIRS += $(FREERTOS_SRC_DIR)/include \
-			$(FREERTOS_SRC_DIR)/portable \
-			$(FREERTOS_SRC_DIR)/portable/GCC/ARM_CM4F \
-			./src/platform
-PROJECT_SRC_DIRS += $(FREERTOS_SRC_DIR) $(FREERTOS_SRC_DIR)/portable/GCC/ARM_CM4F
-
 # Binary blobs (this is somewhat temporary)
 BINFILES = $(notdir $(wildcard $(PROJECT_RESOURCE_DIR)/*.dmp))
-EXTRA_OBJS += $(patsubst %,$(OBJDIR)%,$(BINFILES:.dmp=.o))
+EXTRA_OBJS += $(patsubst %,$(OBJDIR)/%,$(BINFILES:.dmp=.o))
 
 include stm32x/stm32x.mk
+
+$(FREERTOS_OBJS): OPTIONAL_C_FLAGS += -Wno-duplicated-branches -Wno-unused-variable -Wno-unused-but-set-variable
 
 # This step is somewhat convoluted to avoid endless variable names since the whole input path is used.
 # Also we want them in a readonly section, not RAM
 PWD := $(shell pwd)
-$(BUILD_DIR)%.o: %.dmp
+$(BUILD_DIR)/%.o: %.dmp
 	$(ECHO) BIN $<
 	$(Q)cd $(dir $<) && $(LD) -r -b binary -o $(PWD)/$@.ld $(notdir $<) && $(OBJCOPY) -v --rename-section .data=.rodata $(PWD)/$@.ld $(PWD)/$@
 

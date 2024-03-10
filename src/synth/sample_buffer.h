@@ -32,6 +32,9 @@ namespace pfm2sid::synth {
 
 // This is a somewhat special purpose ring buffer or fifo.
 // It makes a bunch of assumptions about the use cases...
+//
+// Technically nothing _needs_ to be power-of-two, but it makes the % operation so simple.
+//
 template <typename T, size_t sample_block_size, size_t num_sample_blocks>
 class SampleBufferT {
 public:
@@ -41,10 +44,8 @@ public:
   constexpr size_t block_size() const { return sample_block_size; }
   constexpr size_t num_blocks() const { return num_sample_blocks; }
 
-  static constexpr size_t kBufferSize = sample_block_size * num_sample_blocks;
-
-  size_t readable() const { return write_pos_ - read_pos_; }
-  size_t writeable() const { return kBufferSize - readable(); }
+  // size_t readable() const { return write_pos_ - read_pos_; }
+  bool writeable() const { return read_block_ != write_block_; }
 
   template <typename type>
   struct Block {
@@ -61,39 +62,45 @@ public:
 
   MutableBlock WriteableBlock()
   {
-    auto begin = write_pos_ % kBufferSize;
-    return {buffer_ + begin, buffer_ + begin + sample_block_size};
+    auto begin = buffers_[write_block_];
+    return {begin, begin + sample_block_size};
   }
 
   template <size_t N>
   void Commit(/*MutableBlock*/)
   {
     static_assert(N == sample_block_size);
-    write_pos_ += N;
+    write_block_ = (write_block_ + 1) % num_sample_blocks;
   }
 
   template <size_t N>
   ConstBlock ReadableBlock() const
   {
     static_assert(1 == N);
-    auto begin = read_pos_ % kBufferSize;
-    return {buffer_ + begin, buffer_ + begin + N};
+    auto begin = buffers_[read_block_] + read_pos_;
+    return {begin, begin + N};
   }
 
   template <size_t N>
-  void Consume(/*ConstBlock*/)
+  auto Consume(/*ConstBlock*/)
   {
     static_assert(1 == N || sample_block_size == N);
-    read_pos_ += N;
+    auto read_pos = (read_pos_ + N) % sample_block_size;
+    bool next_block = 0 == read_pos;
+    if (next_block) read_block_ = (read_block_ + 1) % num_sample_blocks;
+    read_pos_ = read_pos;
+    return next_block;
   }
 
 private:
   // TODO More correcter would be to use std::atomic, but there's no also cache or DMA here...
   // (famous last words).
-  volatile size_t read_pos_ = 0;
-  volatile size_t write_pos_ = sample_block_size * num_sample_blocks / 2;
 
-  T buffer_[kBufferSize];
+  size_t read_pos_ = 0;
+  size_t read_block_ = 0;
+  size_t write_block_ = num_sample_blocks / 2;
+
+  T buffers_[num_sample_blocks][sample_block_size];
 };
 
 }  // namespace pfm2sid::synth

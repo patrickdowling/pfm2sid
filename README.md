@@ -22,7 +22,7 @@ Basic features include:
 Bonus features:
 
 - ASID support over MIDI (switches on automatically on matching sysex)
-- There's a SID file player that can play from a memory buffer. There's currently no (easy) way to get files in though.
+- There's a SID (dump) file player that can play from a memory buffer. There's currently no (easy) way to get files in though (see below, "USB")
 
 ## Caveats
 
@@ -58,7 +58,7 @@ So yes, this project is a super convoluted way of writing a few 8-bit registers 
 
 (In no particular order)
 - clang-tidy, sanitizers (pending clang support in `stm32x`)
-- Support 2 chips/instances of `reSID::SID`. May require smaller blocksize and/or sample rate adjustments but we're at ca. 50% load with one instance, so it "should work". Overclocking is also an option.
+- Support 2 chips/instances of `reSID::SID`. May require smaller blocksize and/or sample rate adjustments but with FreeRTOS support we're at ca. < 45% load with one instance, so it "should work". Overclocking is also an option.
 - Bump modulator update rate (currently ca. 1.3Khz). May also benefit from smaller block size.
 - Arpeggiator
 - Wavetable editor (and/or sysex uploads)

@@ -15,6 +15,13 @@ This works out as `extfilt.output()/11` for the default 16-bit range. My guess i
 
 In this use case we might prefer an 18-bit value anyway and have floats available, so it may be simplified to just output the _raw_ value and we'll post-process it later, e.g. soft clipping. This also avoids moving platform-specifics like `__SSAT` into the reSID code.
 
-
 ### Clocking
 - By using a fixed (or compile-time) `cycles_per_sample` and `clock_delta_t` which could just skip all the sample tracking? 
+### FreeRTOS/interrupts
+Another "satisfy my curiosity" addition to the project: FreeRTOS. Turns out this is useful for putting USB IO "in the background" but requires some care around the interrupts.
+
+- There's a separation between "safe" ISRs and ones of higher priority that cannot use any of the RTOS API.
+- The main DACs are run off of such a high-priority timer ISR.
+- Calculating sample blocks needs to be prioritised as well but can't starve other things.
+- So the DAC ISR fires a secondary ISR within the safe range which wakes the rendering thread. Good times.
+- Pre RTOS, the UI tick would update the display 1 character per tick to avoid blocking the "main loop". Now the main loop updates the display (but still in smaller chunks).

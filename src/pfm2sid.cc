@@ -24,6 +24,7 @@
 
 #include "drivers/core_timer.h"
 #include "drivers/dac_4922.h"
+#include "drivers/hires_timer.h"
 #include "drivers/midi_serial.h"
 #include "drivers/pfm2sid_gpio.h"
 #include "menu/asid_player.h"
@@ -32,6 +33,7 @@
 #include "midi/midi_parser.h"
 #include "pfm2sid_debug.h"
 #include "platform/platform.h"
+#include "platform/platform_config.h"
 #include "sidbits/asid_parser.h"
 #include "synth/engine.h"
 #include "synth/parameters.h"
@@ -56,15 +58,14 @@ Ui ui INCCM;
 namespace stats {
 stm32x::AveragedCycles render_block_cycles;
 stm32x::AveragedCycles sid_clock_cycles;
+stm32x::AveragedCycles ui_tick_cycles;
 unsigned ui_event_counter = 0;
 }  // namespace stats
 
 static util::RingBuffer<uint8_t, kSerialMidiRxBufferSize> serial_midi_rx INCCM;
 static midi::MidiParser serial_midi_parser INCCM;
-
 static MODE current_mode = MODE::INVALID;
 synth::SystemParameters system_parameters INCCM;
-
 synth::PatchBank current_bank;
 synth::Patch current_patch INCCM;
 
@@ -162,6 +163,7 @@ static synth::SampleBuffer sample_buffer INCCM;
 static void Init()
 {
   NVIC_SetVectorTable(NVIC_VectTab_FLASH, FLASH_ORIGIN - NVIC_VectTab_FLASH);  // expects an offset
+  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
   PFM2SID_DEBUG_INIT();
 
   GPIO::EnableClocks(true);
@@ -181,7 +183,6 @@ static void Init()
   sid_synth_editor_.register_listener(&sid_synth_);
   sid_synth_editor_.register_listener(&midi_handler);
 
-  core_timer.Start();
   // STM32X_CORE_INIT(F_CPU / kSysTickUpdateHz); -> FreeRTOS timer
   serial_midi_parser.Init({&midi_handler, nullptr, nullptr});
   midi_handler.set_rx_channel(0);
@@ -189,7 +190,7 @@ static void Init()
 
 static void RenderSampleBlock()
 {
-  while (sample_buffer.writeable() >= sample_buffer.block_size()) {
+  while (sample_buffer.writeable()) {
     while (serial_midi_rx.readable()) { serial_midi_parser.Parse(serial_midi_rx.Read()); }
 
     stm32x::ScopedCycleMeasurement scm{stats::render_block_cycles};
@@ -210,16 +211,30 @@ static void RenderSampleBlock()
   }
 }
 
-extern "C" void Run(void *pvParameters)
+// TODO Critical sections for reset and other "complex" editor operations
+extern "C" void vRenderTask(void *pvParameters)
+{
+  (void)pvParameters;
+
+  uint32_t ulStatus = 0;
+  for (;;) {
+    xTaskNotifyWaitIndexed(TASK_RENDER_IRQ_NOTIFY_IDX, 0, 0, &ulStatus, portMAX_DELAY);
+    RenderSampleBlock();
+  }
+}
+
+extern "C" void vMainTask(void *pvParameters)
 {
   auto mode = static_cast<pfm2sid::MODE>((uint32_t)pvParameters);
   using namespace pfm2sid;
 
   set_mode(mode);
 
-  auto ticks = core_timer.now();
+  RenderSampleBlock();
+  core_timer.Start();
+
+  auto ticks = HiresTimer::now();
   for (;;) {
-    RenderSampleBlock();
     ui.DispatchEvents();
 
     if (sid_synth_.voice_active(0))
@@ -230,17 +245,46 @@ extern "C" void Run(void *pvParameters)
       display.SetIcon<ICON_POS::VOICE3>(ICON_VOICE_ACTIVE, kVoiceActivityTicks);
 
     // This isn't a super-precise method since we're polling
-    // TODO Handling the player/asid update via UI is sketchy
-    auto now = core_timer.now();
-    if (now - ticks > CoreTimer::ms_to_timer(20)) {
+    // TODO Handling the player/asid update via UI is sketchy, but we have RTOS now...
+    auto now = HiresTimer::now();
+    if ((now - ticks) > HiresTimer::ms_to_timer(20)) {
       ui.Step();
       ui.UpdateDisplay();
       ticks = now;
     }
+    {
+      PFM2SID_DEBUG_TRACE(3);
+      display.Tick();
+    }
+
+    xTaskNotifyWaitIndexed(TASK_MAIN_TICK_NOTIFY_IDX, 0, 0, nullptr, pdMS_TO_TICKS(1));
   }
 }
 
+// Use a timer for the UI/display tick. This could also hook the vApplicationTickHook
+// (it's perhaps not quite lightweight enough)
+extern "C" void vTickTimerCallback(TimerHandle_t /* xTimer */)
+{
+  // TODO we might get rid of STM32X_CORE_TICK post-FreeRTOS
+  STM32X_CORE_TICK();
+  stm32x::ScopedCycleMeasurement scm{stats::ui_tick_cycles};
+  PFM2SID_DEBUG_TRACE(2);
+  ui.Tick();
+
+  // wake main task (TODO if events?)
+  xTaskNotifyIndexed(xTaskHandles[TASK_MAIN], TASK_MAIN_TICK_NOTIFY_IDX, 0, eNoAction);
+}
+
 }  // namespace pfm2sid
+
+// Trampoline interrupt from "unsafe but high priority" into "ISR safe API"
+extern "C" void PFM2SID_RENDER_IRQ_HANDLER()
+{
+  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+  xTaskNotifyIndexedFromISR(xTaskHandles[TASK_RENDER], TASK_RENDER_IRQ_NOTIFY_IDX, 0, eIncrement,
+                            &xHigherPriorityTaskWoken);
+  portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+}
 
 // DAC Update
 // We have two DACs with two channels each. To keep the time in the interrupt short (I assume...)
@@ -250,7 +294,9 @@ extern "C" void Run(void *pvParameters)
 // I didn't see a way to build a timer + DMA chain to somehow automate this, and the SPI NSS lines
 // won't help either since we need two chip selects; similarly the I2S interface won't support it
 // either (citation required).
-extern "C" void PFM2SID_CORE_TIMER_HANDLER()
+//
+// Ideally the timing is fairly consistent (since the dac.Load drives the sample and thus jitter.
+extern "C" void PFM2SID_CORE_TIMER_IRQ_HANDLER()
 {
   using namespace pfm2sid;
   if (!core_timer.Ticked()) return;
@@ -260,7 +306,11 @@ extern "C" void PFM2SID_CORE_TIMER_HANDLER()
     // Do we need the 40ns setup time after CS here?
     const auto next_sample = sample_buffer.ReadableBlock<1>()[0];
     dac.Load();
-    sample_buffer.Consume<1>();
+    if (sample_buffer.Consume<1>()) {
+      // Trigger the next block -- which we only want to happen when required, otherwise the
+      // superfluous interrupts will bog things down...
+      NVIC->STIR = PFM2SID_RENDER_IRQn;
+    }
     dac.BeginFrame(next_sample.left, next_sample.right);
   }
 
@@ -272,32 +322,16 @@ extern "C" void PFM2SID_CORE_TIMER_HANDLER()
   if (midi_rx) { serial_midi_rx.Write(midi_rx.value()); }
 }
 
-// Use a timer for the UI/display tick. This could also hook the vApplicationTickHook
-// (it's perhaps not quite lightweight enough)
-extern "C" void vTickTimerCallback(TimerHandle_t /* xTimer */)
-{
-  STM32X_CORE_TICK();
-  using namespace pfm2sid;
-  PFM2SID_DEBUG_TRACE(2);
-  ui.Tick();
-  PFM2SID_DEBUG_TRACE(3);
-  display.Tick();
-}
-
 int main()
 {
   STM32X_DEBUG_INIT();
   pfm2sid::Init();
 
-  xTimerHandles[0] = xTimerCreateStatic("UI", pdMS_TO_TICKS(1), pdTRUE, (void *)0,
-                                        vTickTimerCallback, &xTimerBuffers[0]);
-  configASSERT(nullptr != xTimerHandles[0]);
-  xTimerStart(xTimerHandles[0], 0);
+  TimerCreate(TIMER_UI_TICK, pdMS_TO_TICKS(1), pfm2sid::vTickTimerCallback);
+  TaskCreate(TASK_MAIN, pfm2sid::vMainTask, (void *)pfm2sid::MODE::SID_SYNTH);
+  TaskCreate(TASK_RENDER, pfm2sid::vRenderTask, nullptr);
 
-  xMainTaskHandle = xTaskCreateStatic(pfm2sid::Run, "MAIN", PFM2SID_OS_STACK_SIZE,
-                                      (void *)pfm2sid::MODE::SID_SYNTH, tskIDLE_PRIORITY,
-                                      xTaskStack, &xTaskBuffer);
-  configASSERT(nullptr != xMainTaskHandle);
+  xTimerStart(xTimerHandles[TIMER_UI_TICK], pdMS_TO_TICKS(1));
 
   vTaskStartScheduler();
   for (;;) {}

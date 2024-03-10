@@ -51,11 +51,11 @@ using DEBUG_PIN_4 = GPIO::AIN4;
 #else
 #define PFM2SID_DEBUG_INIT() \
   do {                       \
-  } while ()
+  } while (0)
 
 #define PFM2SID_DEBUG_TRACE(pin) \
   do {                           \
-  } while ()
+  } while (0)
 
 #endif
 
